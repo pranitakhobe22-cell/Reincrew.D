@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Onboarding</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1f2937;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .container{width:100%;max-width:500px;padding:20px}
+    .brand{text-align:center;margin-bottom:30px}
+    .brand h1{font-size:2rem;font-weight:700;color:#111827}
+    .brand h1 span{color:#7a9ebf}
+    
+    .card{background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px;position:relative;overflow:hidden;box-shadow:0 10px 25px rgba(0, 0, 0, 0.05)}
+    .card-header{margin-bottom:28px;text-align:center}
+    .card-header h2{font-size:1.4rem;color:#111827;margin-bottom:8px}
+    .card-header p{color:#6b7280;font-size:.95rem;line-height:1.5}
+    
+    .form-group{margin-bottom:20px}
+    .form-group label{display:block;margin-bottom:8px;font-size:.85rem;color:#4b5563;font-weight:500}
+    .form-group input,.form-group select{width:100%;padding:12px 16px;background:#f9fafb;border:1px solid #d1d5db;border-radius:8px;color:#111827;font-size:.95rem;transition:border-color .2s}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:#7a9ebf}
+    .form-group select option{background:#ffffff}
+    
+    .btn{width:100%;padding:14px;background:#7a9ebf;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;margin-top:10px}
+    .btn:hover{background:#5a52e0}
+    .btn:disabled{background:#3a3a4a;cursor:not-allowed}
+    
+    .msg{padding:12px 16px;border-radius:8px;font-size:.85rem;margin-bottom:20px;display:none;text-align:center}
+    .msg.error{background:#fef2f2;border:1px solid #fee2e2;color:#dc2626}
+    
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin .6s linear infinite;margin-right:10px;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    
+    .ambient-glow{position:absolute;width:200px;height:200px;background:#7a9ebf;border-radius:50%;filter:blur(80px);opacity:0.05;pointer-events:none}
+    .glow-1{top:-100px;left:-100px}
+    .glow-2{bottom:-100px;right:-100px}
+    
+    [id$="-panel"] { display: none; }
+    [id$="-panel"].active { display: block; }
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <div class="container">
+    <div class="brand">
+      <h1>Reincrew<span>.AI</span></h1>
+    </div>
+    <div class="card">
+      <div class="ambient-glow glow-1"></div>
+      <div class="ambient-glow glow-2"></div>
+      
+      <div class="card-header">
+        <h2>Complete Your Profile</h2>
+        <p>Tell us a bit more about yourself so we can tailor the Reincrew.AI experience to you.</p>
+      </div>
+      
+      <div id="msg" class="msg error"></div>
+
+      <!-- Candidate Form -->
+      <div id="candidate-panel">
+        <form onsubmit="submitCandidate(event)">
+          <div class="form-group">
+            <label>College / University</label>
+            <input type="text" id="cand-college" placeholder="E.g. Stanford University (Optional)">
+          </div>
+          <div class="form-group">
+            <label>Target Domain</label>
+            <select id="cand-domain" required>
+              <option value="" disabled selected>Select an interview domain</option>
+              <option value="Software Engineering">Software Engineering</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Product Management">Product Management</option>
+              <option value="Design (UI/UX)">Design (UI/UX)</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Finance">Finance</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Years of Experience</label>
+            <select id="cand-experience" required>
+              <option value="" disabled selected>Select your experience level</option>
+              <option value="Student / Fresher">Student / Fresher</option>
+              <option value="1-3 years">1-3 years</option>
+              <option value="3-5 years">3-5 years</option>
+              <option value="5+ years">5+ years</option>
+            </select>
+          </div>
+          <button type="submit" class="btn" id="cand-btn">Continue to Dashboard</button>
+        </form>
+      </div>
+
+      <!-- Admin / HR Form -->
+      <div id="admin-panel">
+        <form onsubmit="submitAdmin(event)">
+          <div class="form-group">
+            <label>Company Name</label>
+            <input type="text" id="admin-company" placeholder="E.g. Acme Corp" required minlength="2">
+          </div>
+          <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" id="admin-jobtitle" placeholder="E.g. Technical Recruiter" required>
+          </div>
+          <button type="submit" class="btn" id="admin-btn">Continue to Dashboard</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const onboarded = localStorage.getItem('onboarded');
+
+    // Security guards
+    if (!token) {
+      window.location.href = 'login.html';
+    } else if (onboarded === '1') {
+      window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+    }
+
+    // Show correct form
+    if (role === 'admin') {
+      document.getElementById('admin-panel').classList.add('active');
+    } else {
+      document.getElementById('candidate-panel').classList.add('active');
+    }
+
+    function showMsg(text) {
+      const el = document.getElementById('msg');
+      el.textContent = text;
+      el.style.display = 'block';
+    }
+
+    function setLoading(btn, on) {
+      if (on) {
+        btn.disabled = true;
+        btn.dataset.t = btn.textContent;
+        btn.innerHTML = '<span class="spinner"></span>Saving...';
+      } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.t;
+      }
+    }
+
+    async function sendOnboardData(body, btn) {
+      setLoading(btn, true);
+      document.getElementById('msg').style.display = 'none';
+
+      try {
+        const res = await fetch(API + '/auth/onboard', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        
+        if (!data.success) {
+          showMsg(data.error || 'Failed to save onboarding details.');
+          setLoading(btn, false);
+          return;
+        }
+
+        // Success -> Update local state and redirect
+        localStorage.setItem('onboarded', '1');
+        window.location.href = role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+
+      } catch (err) {
+        showMsg('Cannot connect to server. Please try again later.');
+        setLoading(btn, false);
+      }
+    }
+
+    function submitCandidate(e) {
+      e.preventDefault();
+      const body = {
+        college: document.getElementById('cand-college').value.trim(),
+        domain: document.getElementById('cand-domain').value,
+        experience: document.getElementById('cand-experience').value
+      };
+      sendOnboardData(body, document.getElementById('cand-btn'));
+    }
+
+    function submitAdmin(e) {
+      e.preventDefault();
+      const body = {
+        company: document.getElementById('admin-company').value.trim(),
+        jobTitle: document.getElementById('admin-jobtitle').value.trim()
+      };
+      sendOnboardData(body, document.getElementById('admin-btn'));
+    }
+  </script>
+</body>
+</html>

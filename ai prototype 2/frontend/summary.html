@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Interview Summary</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1e293b;min-height:100vh}
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:#ffffff;border-bottom:1px solid #e2e8f0}
+    .navbar .logo{font-size:1.3rem;font-weight:700;color:#0f172a}
+    .navbar .logo span{color:#7a9ebf}
+    .nav-links{display:flex;gap:20px;align-items:center}
+    .nav-links a{color:#64748b;text-decoration:none;font-size:.9rem;transition:color .2s}
+    .nav-links a:hover{color:#7a9ebf}
+
+    .main{max-width:700px;margin:0 auto;padding:40px 24px}
+    .back-link{display:inline-block;color:#7a9ebf;text-decoration:none;font-size:.9rem;margin-bottom:20px}
+    .back-link:hover{text-decoration:underline}
+
+    .score-hero{text-align:center;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:40px 24px;margin-bottom:28px}
+    .score-hero h2{font-size:1.2rem;color:#64748b;margin-bottom:16px}
+    .score-circle{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2.2rem;font-weight:700}
+    .score-high{background:#dcfce7;border:3px solid #86efac;color:#166534}
+    .score-mid{background:#fef9c3;border:3px solid #fde047;color:#854d0e}
+    .score-low{background:#fee2e2;border:3px solid #fca5a5;color:#991b1b}
+    .score-label{font-size:.9rem;color:#64748b}
+    .summary-text{margin-top:16px;font-size:1rem;color:#475569;line-height:1.6}
+
+    .stat-row{display:flex;gap:14px;margin-bottom:28px}
+    .stat-card{flex:1;background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:18px;text-align:center}
+    .stat-card .num{font-size:1.4rem;font-weight:700;color:#7a9ebf}
+    .stat-card .lbl{font-size:.8rem;color:#64748b;margin-top:4px}
+
+    .card{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:20px}
+    .card h3{color:#0f172a;margin-bottom:16px;font-size:1.05rem}
+    .card ul{list-style:none;padding:0}
+    .card ul li{padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:.92rem;color:#475569;padding-left:20px;position:relative}
+    .card ul li:last-child{border-bottom:none}
+    .card ul li::before{content:'';position:absolute;left:0;top:14px;width:8px;height:8px;border-radius:50%}
+    .strengths li::before{background:#16a34a}
+    .improvements li::before{background:#ca8a04}
+
+    .actions{display:flex;gap:12px;margin-top:8px}
+    .btn{flex:1;padding:12px;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-align:center;text-decoration:none;display:block}
+    .btn.primary{background:#7a9ebf;color:#fff}
+    .btn.primary:hover{background:#5a52e0}
+    .btn.secondary{background:transparent;color:#7a9ebf;border:1px solid #7a9ebf}
+    .btn.secondary:hover{background:#7a9ebf22}
+
+    .loading{text-align:center;padding:60px;color:#64748b}
+    .spinner{width:30px;height:30px;border:3px solid #e2e8f0;border-radius:50%;border-top-color:#7a9ebf;animation:spin .7s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:640px){.navbar{padding:12px 16px;flex-direction:column;gap:10px}.stat-row{flex-direction:column}.actions{flex-direction:column}}
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <nav class="navbar">
+    <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="Logo">
+        Reincrew<span>.AI</span></div>
+    <div class="nav-links">
+      <a href="student-dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <a href="student-dashboard.html" class="back-link">&#8592; Back to Dashboard</a>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading results...</p>
+    </div>
+
+    <div id="content" style="display:none">
+      <div class="score-hero">
+        <h2>Interview Performance</h2>
+        <div class="score-circle" id="score-circle">-</div>
+        <div class="score-label">out of 10</div>
+        <p class="summary-text" id="summary-text"></p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="num" id="s-asked">-</div><div class="lbl">Questions Asked</div></div>
+        <div class="stat-card"><div class="num" id="s-answered">-</div><div class="lbl">Answered</div></div>
+        <div class="stat-card"><div class="num" id="s-status">-</div><div class="lbl">Status</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Strengths</h3>
+        <ul class="strengths" id="strengths-list"></ul>
+      </div>
+
+      <div class="card">
+        <h3>Areas for Improvement</h3>
+        <ul class="improvements" id="improvements-list"></ul>
+      </div>
+
+      <div class="actions">
+        <a href="camera.html" class="btn primary">Take Another Interview</a>
+        <a href="student-dashboard.html" class="btn secondary">Go to Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    function handleUnauthorized(res) {
+      if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; return true; }
+      return false;
+    }
+
+    function scoreClass(s) {
+      if (s >= 7) return 'score-high';
+      if (s >= 4) return 'score-mid';
+      return 'score-low';
+    }
+
+    function render(data) {
+      document.getElementById('score-circle').textContent = data.score !== null && data.score !== undefined ? data.score : '-';
+      document.getElementById('score-circle').className = 'score-circle ' + scoreClass(data.score || 0);
+      document.getElementById('summary-text').textContent = data.summary || '';
+      document.getElementById('s-asked').textContent = data.questionsAsked || '-';
+      document.getElementById('s-answered').textContent = data.questionsAnswered || '-';
+      document.getElementById('s-status').textContent = (data.status || '').replace('_', ' ');
+
+      const sl = document.getElementById('strengths-list');
+      const il = document.getElementById('improvements-list');
+      sl.innerHTML = (data.strengths && data.strengths.length > 0)
+        ? data.strengths.map(s => '<li>' + s + '</li>').join('')
+        : '<li>No data available</li>';
+      il.innerHTML = (data.improvements && data.improvements.length > 0)
+        ? data.improvements.map(s => '<li>' + s + '</li>').join('')
+        : '<li>No data available</li>';
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    async function load() {
+      // Try localStorage first (redirect from interview page)
+      const cached = localStorage.getItem('lastResult');
+      if (cached) {
+        try { render(JSON.parse(cached)); localStorage.removeItem('lastResult'); return; } catch {}
+      }
+
+      // Fallback: fetch from student interviews
+      try {
+        const res = await fetch(API + '/student/interviews', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success || data.data.interviews.length === 0) {
+          document.getElementById('loading').innerHTML = '<p style="color:#888">No interview data found.</p>';
+          return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const targetId = params.get('id') ? parseInt(params.get('id')) : null;
+        let interview = targetId
+          ? data.data.interviews.find(i => i.interviewId === targetId)
+          : data.data.interviews.find(i => i.status === 'completed') || data.data.interviews[0];
+
+        if (interview) render(interview);
+        else document.getElementById('loading').innerHTML = '<p style="color:#888">Interview not found.</p>';
+      } catch {
+        document.getElementById('loading').innerHTML = '<p style="color:#ff6b6b">Cannot connect to server.</p>';
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

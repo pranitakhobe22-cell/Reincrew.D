@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Profile</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1e293b;min-height:100vh}
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:#ffffff;border-bottom:1px solid #e2e8f0}
+    .navbar .logo{font-size:1.3rem;font-weight:700;color:#0f172a}
+    .navbar .logo span{color:#7a9ebf}
+    .nav-links{display:flex;gap:20px;align-items:center}
+    .nav-links a{color:#64748b;text-decoration:none;font-size:.9rem;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:#7a9ebf}
+    .nav-links .logout{color:#ff6b6b;cursor:pointer;background:none;border:none;font-size:.9rem;font-family:inherit}
+    .nav-links .logout:hover{color:#ff4444}
+
+    .main{max-width:700px;margin:0 auto;padding:40px 24px}
+    .page-title{font-size:1.5rem;color:#0f172a;margin-bottom:28px}
+
+    .card{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;margin-bottom:24px}
+    .card h3{color:#0f172a;margin-bottom:20px;font-size:1.05rem;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+
+    .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+    .info-row:last-child{border-bottom:none}
+    .info-row .label{color:#64748b;font-size:.9rem}
+    .info-row .value{color:#1e293b;font-size:.9rem;font-weight:500}
+
+    .skills-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .skill-tag{background:#7a9ebf11;color:#7a9ebf;padding:6px 14px;border-radius:20px;font-size:.85rem;border:1px solid #7a9ebf22}
+
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .stat-card{background:transparent;border:1px solid #e2e8f0;border-radius:10px;padding:18px;text-align:center}
+    .stat-card .num{font-size:1.6rem;font-weight:700;color:#7a9ebf}
+    .stat-card .lbl{font-size:.8rem;color:#64748b;margin-top:4px}
+
+    .loading{text-align:center;padding:30px;color:#64748b}
+    .spinner{display:inline-block;width:24px;height:24px;border:3px solid #e2e8f0;border-radius:50%;border-top-color:#7a9ebf;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .back-link{display:inline-block;color:#7a9ebf;text-decoration:none;font-size:.9rem;margin-bottom:20px}
+    .back-link:hover{text-decoration:underline}
+
+    @media(max-width:640px){
+      .navbar{padding:12px 16px;flex-direction:column;gap:10px}
+      .stat-grid{grid-template-columns:1fr}
+      .info-row{flex-direction:column;gap:4px}
+    }
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <nav class="navbar">
+    <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="Logo">
+        Reincrew<span>.AI</span></div>
+    <div class="nav-links">
+      <a href="student-dashboard.html">Dashboard</a>
+      <a href="profile.html" class="active">Profile</a>
+      <a href="resume.html">Resume</a>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <a href="student-dashboard.html" class="back-link">&#8592; Back to Dashboard</a>
+    <h1 class="page-title">My Profile</h1>
+
+    <div class="loading" id="loading"><div class="spinner"></div></div>
+    <div id="content" style="display:none">
+
+      <!-- Basic Info -->
+      <div class="card">
+        <h3>Personal Information</h3>
+        <div class="info-row"><span class="label">Name</span><span class="value" id="p-name">-</span></div>
+        <div class="info-row"><span class="label">Email</span><span class="value" id="p-email">-</span></div>
+        <div class="info-row"><span class="label">Role</span><span class="value" id="p-role">-</span></div>
+        <div class="info-row"><span class="label">College</span><span class="value" id="p-college">-</span></div>
+        <div class="info-row"><span class="label">Member Since</span><span class="value" id="p-date">-</span></div>
+      </div>
+
+      <!-- Resume Analysis -->
+      <div class="card">
+        <h3>Resume Analysis</h3>
+        <div class="info-row"><span class="label">Resume Status</span><span class="value" id="p-resume">-</span></div>
+        <div class="info-row"><span class="label">Domain</span><span class="value" id="p-domain">-</span></div>
+        <div class="info-row"><span class="label">Experience Level</span><span class="value" id="p-exp">-</span></div>
+        <div class="info-row">
+          <span class="label">Skills</span>
+          <div class="skills-list" id="skills-container">-</div>
+        </div>
+      </div>
+
+      <!-- Interview Stats -->
+      <div class="card">
+        <h3>Interview Statistics</h3>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="num" id="s-total">0</div><div class="lbl">Total Interviews</div></div>
+          <div class="stat-card"><div class="num" id="s-completed">0</div><div class="lbl">Completed</div></div>
+          <div class="stat-card"><div class="num" id="s-avg">-</div><div class="lbl">Avg Score</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    function handleUnauthorized(res) {
+      if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; return true; }
+      return false;
+    }
+    function authHeaders() { return { 'Authorization': 'Bearer ' + token }; }
+
+    async function load() {
+      try {
+        const [profRes, ivRes] = await Promise.all([
+          fetch(API + '/student/profile', { headers: authHeaders() }),
+          fetch(API + '/student/interviews', { headers: authHeaders() }),
+        ]);
+        if (handleUnauthorized(profRes) || handleUnauthorized(ivRes)) return;
+        const prof = await profRes.json();
+        const ivs = await ivRes.json();
+
+        if (!prof.success) return;
+
+        const p = prof.data;
+        document.getElementById('p-name').textContent = p.name;
+        document.getElementById('p-email').textContent = p.email;
+        document.getElementById('p-role').textContent = p.role.charAt(0).toUpperCase() + p.role.slice(1);
+        document.getElementById('p-college').textContent = p.college || 'Not specified';
+        document.getElementById('p-date').textContent = new Date(p.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+        document.getElementById('p-resume').textContent = p.resumeUploaded ? 'Uploaded' : 'Not uploaded';
+        document.getElementById('p-domain').textContent = p.domain || 'Not analysed yet';
+        document.getElementById('p-exp').textContent = p.experience ? p.experience.charAt(0).toUpperCase() + p.experience.slice(1) : 'Not analysed yet';
+
+        const sc = document.getElementById('skills-container');
+        if (p.skills && p.skills.length > 0) {
+          sc.innerHTML = p.skills.map(s => '<span class="skill-tag">' + s + '</span>').join('');
+        } else {
+          sc.textContent = 'Upload a resume to see skills';
+        }
+
+        // Stats
+        if (ivs.success) {
+          const interviews = ivs.data.interviews;
+          const completed = interviews.filter(i => i.status === 'completed');
+          document.getElementById('s-total').textContent = interviews.length;
+          document.getElementById('s-completed').textContent = completed.length;
+          if (completed.length > 0) {
+            const avg = completed.reduce((sum, i) => sum + (i.score || 0), 0) / completed.length;
+            document.getElementById('s-avg').textContent = (Math.round(avg * 10) / 10) + '/10';
+          }
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } catch {
+        document.getElementById('loading').innerHTML = '<p style="color:#ff6b6b">Cannot connect to server.</p>';
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

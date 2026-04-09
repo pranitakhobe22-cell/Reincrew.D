@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Interview</title>
+  <!-- MediaPipe Vision (face + hand detection) -->
+  <script type="module">
+    import { FilesetResolver, FaceDetector, HandLandmarker } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/vision_bundle.mjs';
+    window._MPVision = { FilesetResolver, FaceDetector, HandLandmarker };
+    window.dispatchEvent(new Event('mediapipe-ready'));
+  </script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1e293b;min-height:100vh;display:flex;flex-direction:column}
+
+    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:#ffffff;border-bottom:1px solid #e2e8f0}
+    .top-bar .logo{font-size:1.2rem;font-weight:700;color:#0f172a}
+    .top-bar .logo span{color:#7a9ebf}
+    .top-bar .status{display:flex;align-items:center;gap:16px}
+    .progress-text{font-size:.85rem;color:#888}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:#ff4444;display:inline-block;animation:blink 1.5s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+    .mode-badge{padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .mode-badge.voice{background:#7a9ebf22;color:#7a9ebf}
+    .mode-badge.text{background:#1e1e2e;color:#888}
+    .end-btn{padding:8px 18px;background:#2d1520;color:#ff6b6b;border:1px solid #5c2030;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+    .end-btn:hover{background:#ff6b6b;color:#fff}
+
+    .main{flex:1;display:flex;max-width:1100px;width:100%;margin:0 auto;padding:24px;gap:24px}
+
+    .q-panel{flex:1;display:flex;flex-direction:column}
+    .q-header{color:#888;font-size:.85rem;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+    .q-number{font-size:1.1rem;color:#7a9ebf;font-weight:600;margin-bottom:12px}
+
+    /* Question with speaking indicator */
+    .q-text{font-size:1.15rem;color:#1e293b;line-height:1.6;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;margin-bottom:20px;position:relative;transition:border-color .3s}
+    .q-text.speaking{border-color:#7a9ebf;box-shadow:0 0 20px #7a9ebf22}
+    .q-speaker-icon{position:absolute;top:12px;right:14px;font-size:1.1rem;opacity:0;transition:opacity .3s}
+    .q-text.speaking .q-speaker-icon{opacity:1;animation:speakerPulse 1s infinite}
+    @keyframes speakerPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* Voice answer area */
+    .voice-area{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:16px;display:none}
+    .voice-status{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .mic-indicator{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .3s;cursor:pointer}
+    .mic-indicator.idle{background:#1e1e2e;color:#888}
+    .mic-indicator.listening{background:#7a9ebf;color:#fff;box-shadow:0 0 0 0 #7a9ebf44;animation:micPulse 1.5s infinite}
+    .mic-indicator.processing{background:#2d2a15;color:#ffd56b}
+    @keyframes micPulse{0%{box-shadow:0 0 0 0 #7a9ebf44}70%{box-shadow:0 0 0 16px #7a9ebf00}100%{box-shadow:0 0 0 0 #7a9ebf00}}
+    .voice-label{font-size:.9rem;color:#1e293b}
+    .voice-sublabel{font-size:.8rem;color:#94a3b8}
+
+    .transcript-box{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:14px;min-height:80px;font-size:.95rem;color:#1e293b;line-height:1.5;white-space:pre-wrap}
+    .transcript-box .interim{color:#7a9ebf;opacity:.7}
+    .transcript-box .final{color:#1e293b}
+    .transcript-placeholder{color:#94a3b8;font-style:italic}
+
+    /* Waveform visualizer */
+    .waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:32px;margin:12px 0}
+    .wave-bar{width:4px;background:#7a9ebf;border-radius:2px;animation:none;transition:height .1s}
+    .waveform.active .wave-bar{animation:wave .8s ease-in-out infinite}
+    .wave-bar:nth-child(1){animation-delay:0s}
+    .wave-bar:nth-child(2){animation-delay:.1s}
+    .wave-bar:nth-child(3){animation-delay:.2s}
+    .wave-bar:nth-child(4){animation-delay:.3s}
+    .wave-bar:nth-child(5){animation-delay:.15s}
+    .wave-bar:nth-child(6){animation-delay:.25s}
+    .wave-bar:nth-child(7){animation-delay:.05s}
+    @keyframes wave{0%,100%{height:6px}50%{height:28px}}
+
+    .voice-actions{display:flex;gap:10px;margin-top:14px}
+    .voice-btn{padding:10px 20px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+    .voice-btn.listen{background:#7a9ebf;color:#fff}
+    .voice-btn.listen:hover{background:#5a52e0}
+    .voice-btn.stop{background:#2d1520;color:#ff6b6b;border:1px solid #5c2030}
+    .voice-btn.stop:hover{background:#ff6b6b;color:#fff}
+    .voice-btn.replay{background:#1e1e2e;color:#aaa}
+    .voice-btn.replay:hover{color:#7a9ebf}
+    .voice-btn:disabled{background:#1e1e2e;color:#555;cursor:not-allowed}
+
+    /* Text answer area */
+    .answer-area{flex:1;display:flex;flex-direction:column}
+    .answer-area textarea{flex:1;width:100%;min-height:160px;padding:16px;background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;color:#1e293b;font-size:1rem;font-family:inherit;resize:vertical;transition:border-color .2s;line-height:1.6}
+    .answer-area textarea:focus{outline:none;border-color:#7a9ebf}
+    .answer-area textarea::placeholder{color:#94a3b8}
+    .char-count{text-align:right;font-size:.8rem;color:#555;margin-top:6px}
+
+    .submit-row{display:flex;gap:12px;margin-top:14px}
+    .btn{padding:12px 28px;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+    .btn.primary{background:#7a9ebf;color:#fff}
+    .btn.primary:hover{background:#5a52e0}
+    .btn.primary:disabled{background:#3a3a4a;cursor:not-allowed}
+    .btn.skip{background:transparent;color:#888;border:1px solid #3a3a4a}
+    .btn.skip:hover{border-color:#7a9ebf;color:#7a9ebf}
+
+    .cam-panel{width:260px;flex-shrink:0}
+    .cam-box{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:16px;position:relative}
+    .cam-box video{width:100%;display:block;transform:scaleX(-1)}
+    .cam-box canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+    .cam-monitor-badge{position:absolute;top:6px;left:6px;background:#0a0a0fcc;padding:3px 8px;border-radius:4px;font-size:.7rem;color:#6bff8b;display:flex;align-items:center;gap:4px}
+    .cam-monitor-dot{width:5px;height:5px;border-radius:50%;background:#6bff8b;animation:camBlink 1.5s infinite}
+    @keyframes camBlink{0%,100%{opacity:1}50%{opacity:.3}}
+    .cam-frame-count{position:absolute;bottom:28px;right:6px;background:#0a0a0fcc;padding:2px 6px;border-radius:4px;font-size:.65rem;color:#888}
+    .cam-label{text-align:center;padding:8px;font-size:.8rem;color:#888}
+
+    /* Face detection overlay */
+    .cam-gaze-status{position:absolute;top:6px;right:6px;background:#0a0a0fcc;padding:3px 8px;border-radius:4px;font-size:.7rem;color:#6bff8b;display:flex;align-items:center;gap:4px;transition:color .3s,background .3s}
+    .cam-gaze-status.warning{color:#ffd56b;background:#2d2a15cc}
+    .cam-gaze-status.danger{color:#ff6b6b;background:#2d1520cc}
+    .cam-face-indicator{position:absolute;bottom:28px;left:6px;background:#0a0a0fcc;padding:2px 6px;border-radius:4px;font-size:.65rem;color:#6bff8b;transition:color .3s}
+    .cam-face-indicator.missing{color:#ff6b6b}
+    .cam-hand-indicator{position:absolute;bottom:42px;left:6px;background:#0a0a0fcc;padding:2px 6px;border-radius:4px;font-size:.65rem;color:#888;transition:color .3s}
+    .cam-hand-indicator.near-face{color:#ffd56b}
+    .cam-hand-indicator.violation{color:#ff6b6b}
+    .cam-multiface{position:absolute;bottom:42px;right:6px;background:#0a0a0fcc;padding:2px 6px;border-radius:4px;font-size:.65rem;color:#888;display:none}
+    .cam-multiface.active{display:block;color:#ff6b6b}
+
+    .progress-bar{background:#e2e8f0;border-radius:8px;height:6px;margin-bottom:24px;overflow:hidden}
+    .progress-fill{height:100%;background:#7a9ebf;border-radius:8px;transition:width .4s ease}
+
+    .loading-screen{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+    .spinner{width:36px;height:36px;border:4px solid #e2e8f0;border-radius:50%;border-top-color:#7a9ebf;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .msg{padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:16px}
+    .msg.error{background:#2d1520;border:1px solid #5c2030;color:#ff6b6b}
+    .inline-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
+
+    /* Auto-submit countdown */
+    .auto-submit-bar{margin-top:10px;display:none}
+    .auto-submit-label{font-size:.8rem;color:#888;margin-bottom:4px}
+    .auto-submit-progress{height:4px;background:#1e1e2e;border-radius:2px;overflow:hidden}
+    .auto-submit-fill{height:100%;background:#7a9ebf;border-radius:2px;transition:width .1s linear}
+
+    @media(max-width:768px){
+      .main{flex-direction:column-reverse}
+      .cam-panel{width:100%}
+      .cam-box video{max-height:160px;object-fit:cover}
+      .top-bar{padding:10px 16px}
+      .top-bar .status{gap:8px;flex-wrap:wrap}
+    }
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <div class="top-bar">
+    <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="Logo">
+        Reincrew<span>.AI</span></div>
+    <div class="status">
+      <span class="mode-badge" id="mode-badge">TEXT</span>
+      <span class="progress-text" id="progress-text">Loading...</span>
+      <span class="live-dot"></span>
+      <button class="end-btn" id="end-btn" onclick="endInterview()" style="display:none">End Interview</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="spinner"></div>
+    <p style="color:#888" id="loading-msg">Starting interview &mdash; AI is generating questions...</p>
+  </div>
+
+  <!-- Interview UI -->
+  <div class="main" id="interview-ui" style="display:none">
+    <div class="q-panel">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="q-header">INTERVIEW QUESTION</div>
+      <div class="q-number" id="q-number">Question 1 of 5</div>
+      <div class="q-text" id="q-text">
+        <span id="q-text-content"></span>
+        <span class="q-speaker-icon" id="q-speaker-icon">&#128266;</span>
+      </div>
+
+      <!-- Voice Answer Area (voice mode) -->
+      <div class="voice-area" id="voice-area">
+        <div class="voice-status">
+          <div class="mic-indicator idle" id="mic-indicator" onclick="toggleListening()">&#127908;</div>
+          <div>
+            <div class="voice-label" id="voice-label">Click mic or press Space to start speaking</div>
+            <div class="voice-sublabel" id="voice-sublabel">Your answer will be transcribed in real-time</div>
+          </div>
+        </div>
+
+        <div class="waveform" id="waveform">
+          <div class="wave-bar" style="height:6px"></div>
+          <div class="wave-bar" style="height:6px"></div>
+          <div class="wave-bar" style="height:6px"></div>
+          <div class="wave-bar" style="height:6px"></div>
+          <div class="wave-bar" style="height:6px"></div>
+          <div class="wave-bar" style="height:6px"></div>
+          <div class="wave-bar" style="height:6px"></div>
+        </div>
+
+        <div class="transcript-box" id="transcript-box">
+          <span class="transcript-placeholder" id="transcript-placeholder">Your spoken answer will appear here...</span>
+          <span class="final" id="transcript-final"></span>
+          <span class="interim" id="transcript-interim"></span>
+        </div>
+
+        <div class="auto-submit-bar" id="auto-submit-bar">
+          <div class="auto-submit-label">Auto-submitting in <span id="auto-submit-countdown">3</span>s...</div>
+          <div class="auto-submit-progress"><div class="auto-submit-fill" id="auto-submit-fill"></div></div>
+        </div>
+
+        <div class="voice-actions">
+          <button class="voice-btn listen" id="listen-btn" onclick="toggleListening()">Start Listening</button>
+          <button class="voice-btn replay" id="replay-btn" onclick="replayQuestion()" title="Replay question aloud">Replay Question</button>
+          <button class="voice-btn stop" id="voice-submit-btn" onclick="submitVoiceAnswer()">Submit Answer</button>
+        </div>
+      </div>
+
+      <!-- Text Answer Area (text mode) -->
+      <div class="answer-area" id="text-area">
+        <textarea id="answer-input" placeholder="Type your answer here..." oninput="updateCharCount()"></textarea>
+        <div class="char-count"><span id="char-count">0</span> characters</div>
+        <div class="submit-row">
+          <button class="btn skip" onclick="skipQuestion()">Skip</button>
+          <button class="btn primary" id="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cam-panel">
+      <div class="cam-box">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="monitor-canvas"></canvas>
+        <div class="cam-monitor-badge"><span class="cam-monitor-dot"></span> Monitoring</div>
+        <div class="cam-gaze-status" id="cam-gaze-status">Gaze: --</div>
+        <div class="cam-hand-indicator" id="cam-hand-indicator">Hands: --</div>
+        <div class="cam-face-indicator" id="cam-face-indicator">Face: --</div>
+        <div class="cam-multiface" id="cam-multiface">Multi-face</div>
+        <div class="cam-frame-count" id="cam-frame-count">0 frames</div>
+        <div class="cam-label">Camera Feed</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="error-msg" style="display:none;max-width:600px;margin:20px auto" class="msg error"></div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    let interviewId = null;
+    let questions = [];
+    let currentIdx = 0;
+    let totalQuestions = 0;
+    let stream = null;
+    let isVoiceMode = localStorage.getItem('interviewMode') === 'voice';
+
+    // Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+    let finalTranscript = '';
+    let autoSubmitTimer = null;
+    let autoSubmitCountdown = 3;
+    let autoSubmitInterval = null;
+    let isSpeaking = false;
+
+    function authHeaders() {
+      return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+    }
+
+    function handleUnauthorized(res) {
+      if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; return true; }
+      return false;
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = msg; el.style.display = 'block';
+    }
+
+    function updateCharCount() {
+      document.getElementById('char-count').textContent = document.getElementById('answer-input').value.length;
+    }
+
+    // ==================== SPEECH SYNTHESIS ====================
+    function speakQuestion(text) {
+      return new Promise((resolve) => {
+        if (!isVoiceMode || !window.speechSynthesis) { resolve(); return; }
+        window.speechSynthesis.cancel();
+        isSpeaking = true;
+
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.95;
+        utter.pitch = 1;
+        utter.volume = 1;
+
+        // Try to pick a good English voice
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) ||
+                          voices.find(v => v.lang.startsWith('en-US')) ||
+                          voices.find(v => v.lang.startsWith('en'));
+        if (preferred) utter.voice = preferred;
+
+        const qText = document.getElementById('q-text');
+        qText.classList.add('speaking');
+
+        utter.onend = () => {
+          isSpeaking = false;
+          qText.classList.remove('speaking');
+          resolve();
+        };
+        utter.onerror = () => {
+          isSpeaking = false;
+          qText.classList.remove('speaking');
+          resolve();
+        };
+
+        window.speechSynthesis.speak(utter);
+      });
+    }
+
+    function replayQuestion() {
+      if (isSpeaking) return;
+      speakQuestion(questions[currentIdx]);
+    }
+
+    // ==================== SPEECH RECOGNITION ====================
+    function initRecognition() {
+      if (!SpeechRecognition) {
+        // Browser does not support SpeechRecognition — fall back to text mode
+        showError('Speech recognition is not supported in this browser. Switching to text mode. Use Chrome for voice mode.');
+        isVoiceMode = false;
+        document.getElementById('voice-area').style.display = 'none';
+        document.getElementById('text-area').style.display = 'flex';
+        const modeBadge = document.getElementById('mode-badge');
+        modeBadge.textContent = 'TEXT';
+        modeBadge.className = 'mode-badge text';
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        finalTranscript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+
+        document.getElementById('transcript-placeholder').style.display = 'none';
+        document.getElementById('transcript-final').textContent = finalTranscript;
+        document.getElementById('transcript-interim').textContent = interim;
+
+        // Also insert transcript into the answer textarea
+        document.getElementById('answer-input').value = finalTranscript + (interim ? ' ' + interim : '');
+
+        // Reset auto-submit timer on new speech
+        cancelAutoSubmit();
+      };
+
+      recognition.onspeechend = () => {
+        // If there's a transcript, start auto-submit countdown
+        if (finalTranscript.trim().length > 0) {
+          startAutoSubmit();
+        }
+      };
+
+      recognition.onerror = (event) => {
+        if (event.error === 'no-speech') {
+          // Restart if no speech detected
+          if (isListening) {
+            try { recognition.start(); } catch {}
+          }
+        } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          // Microphone permission denied
+          stopListening();
+          showError('Microphone permission denied. Please allow microphone access and reload, or switch to text mode.');
+          document.getElementById('voice-label').textContent = 'Microphone permission denied';
+          document.getElementById('voice-sublabel').textContent = 'Allow mic access in browser settings and reload';
+        } else if (event.error === 'network') {
+          stopListening();
+          document.getElementById('voice-label').textContent = 'Network error — speech service unavailable';
+          document.getElementById('voice-sublabel').textContent = 'Check your internet connection';
+        } else if (event.error !== 'aborted') {
+          console.error('Speech recognition error:', event.error);
+          stopListening();
+        }
+      };
+
+      recognition.onend = () => {
+        // Auto-restart if still in listening mode
+        if (isListening) {
+          try { recognition.start(); } catch {}
+        }
+      };
+    }
+
+    function toggleListening() {
+      if (isListening) { stopListening(); } else { startListening(); }
+    }
+
+    function startListening() {
+      if (!recognition || isSpeaking) return;
+      isListening = true;
+      finalTranscript = '';
+      document.getElementById('transcript-final').textContent = '';
+      document.getElementById('transcript-interim').textContent = '';
+      document.getElementById('transcript-placeholder').style.display = 'none';
+
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error('Recognition start failed:', err);
+        isListening = false;
+        document.getElementById('voice-label').textContent = 'Failed to start microphone';
+        document.getElementById('voice-sublabel').textContent = 'Click mic to try again';
+        return;
+      }
+
+      const mic = document.getElementById('mic-indicator');
+      mic.className = 'mic-indicator listening';
+      document.getElementById('waveform').classList.add('active');
+      document.getElementById('listen-btn').textContent = 'Stop Listening';
+      document.getElementById('listen-btn').className = 'voice-btn stop';
+      document.getElementById('voice-label').textContent = 'Listening... Speak your answer';
+      document.getElementById('voice-sublabel').textContent = 'Click mic or press Space to stop';
+      cancelAutoSubmit();
+    }
+
+    function stopListening() {
+      isListening = false;
+      try { recognition.stop(); } catch {}
+
+      const mic = document.getElementById('mic-indicator');
+      mic.className = 'mic-indicator idle';
+      document.getElementById('waveform').classList.remove('active');
+      document.getElementById('listen-btn').textContent = 'Start Listening';
+      document.getElementById('listen-btn').className = 'voice-btn listen';
+      document.getElementById('voice-label').textContent = 'Click mic or press Space to start speaking';
+      document.getElementById('voice-sublabel').textContent = 'Your answer will be transcribed in real-time';
+
+      // Start auto-submit if there's a transcript
+      if (finalTranscript.trim().length > 0) {
+        startAutoSubmit();
+      }
+    }
+
+    // ==================== AUTO SUBMIT ====================
+    function startAutoSubmit() {
+      cancelAutoSubmit();
+      autoSubmitCountdown = 3;
+      const bar = document.getElementById('auto-submit-bar');
+      bar.style.display = 'block';
+      document.getElementById('auto-submit-countdown').textContent = autoSubmitCountdown;
+      document.getElementById('auto-submit-fill').style.width = '100%';
+
+      autoSubmitInterval = setInterval(() => {
+        autoSubmitCountdown--;
+        document.getElementById('auto-submit-countdown').textContent = Math.max(0, autoSubmitCountdown);
+        document.getElementById('auto-submit-fill').style.width = ((autoSubmitCountdown / 3) * 100) + '%';
+
+        if (autoSubmitCountdown <= 0) {
+          cancelAutoSubmit();
+          submitVoiceAnswer();
+        }
+      }, 1000);
+    }
+
+    function cancelAutoSubmit() {
+      if (autoSubmitInterval) { clearInterval(autoSubmitInterval); autoSubmitInterval = null; }
+      document.getElementById('auto-submit-bar').style.display = 'none';
+    }
+
+    // ==================== RENDER QUESTION ====================
+    async function renderQuestion() {
+      if (currentIdx >= totalQuestions) { endInterview(); return; }
+
+      // Cancel any ongoing speech or listening
+      window.speechSynthesis.cancel();
+      if (isListening) stopListening();
+      cancelAutoSubmit();
+
+      document.getElementById('q-number').textContent = 'Question ' + (currentIdx + 1) + ' of ' + totalQuestions;
+      document.getElementById('q-text-content').textContent = questions[currentIdx];
+      document.getElementById('progress-text').textContent = (currentIdx + 1) + '/' + totalQuestions;
+      document.getElementById('progress-fill').style.width = ((currentIdx / totalQuestions) * 100) + '%';
+
+      if (isVoiceMode) {
+        // Reset voice UI
+        finalTranscript = '';
+        document.getElementById('transcript-final').textContent = '';
+        document.getElementById('transcript-interim').textContent = '';
+        document.getElementById('transcript-placeholder').style.display = 'inline';
+        document.getElementById('voice-submit-btn').disabled = false;
+
+        // AI reads question aloud, then auto-start listening
+        await speakQuestion(questions[currentIdx]);
+        // Small delay then start listening
+        setTimeout(() => { if (!isListening) startListening(); }, 500);
+      } else {
+        document.getElementById('answer-input').value = '';
+        document.getElementById('char-count').textContent = '0';
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('submit-btn').textContent = 'Submit Answer';
+        document.getElementById('answer-input').focus();
+      }
+    }
+
+    // ==================== SUBMIT ====================
+    async function submitVoiceAnswer() {
+      const answer = finalTranscript.trim();
+      if (!answer) { startListening(); return; }
+
+      cancelAutoSubmit();
+      if (isListening) stopListening();
+
+      document.getElementById('voice-submit-btn').disabled = true;
+      document.getElementById('voice-label').textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(API + '/interview/answer', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ interviewId, answer }),
+        });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success) { showError(data.error); document.getElementById('voice-submit-btn').disabled = false; return; }
+        currentIdx++;
+        if (data.data.isComplete) { endInterview(); } else { renderQuestion(); }
+      } catch {
+        showError('Failed to submit answer.');
+        document.getElementById('voice-submit-btn').disabled = false;
+      }
+    }
+
+    async function submitAnswer() {
+      const answer = document.getElementById('answer-input').value.trim();
+      if (!answer) { document.getElementById('answer-input').focus(); return; }
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-spinner"></span>Submitting...';
+      try {
+        const res = await fetch(API + '/interview/answer', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ interviewId, answer }),
+        });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success) { showError(data.error); btn.disabled = false; btn.textContent = 'Submit Answer'; return; }
+        currentIdx++;
+        if (data.data.isComplete) { endInterview(); } else { renderQuestion(); }
+      } catch {
+        showError('Failed to submit answer.');
+        btn.disabled = false; btn.textContent = 'Submit Answer';
+      }
+    }
+
+    function skipQuestion() {
+      if (isVoiceMode) {
+        finalTranscript = 'Skipped';
+        submitVoiceAnswer();
+      } else {
+        document.getElementById('answer-input').value = 'Skipped';
+        submitAnswer();
+      }
+    }
+
+    // ==================== CAMERA MONITOR ====================
+    const CameraMonitor = {
+      canvas: null,
+      ctx: null,
+      interval: null,
+      frames: [],
+      frameCount: 0,
+      maxBuffer: 60,
+
+      // Face detection
+      faceDetector: null,
+      faceDetectorReady: false,
+      videoRef: null,
+
+      // Gaze / violation state
+      gazeDirection: 'center',      // center | left | right | down | away
+      facePresent: false,
+      gazeAwayStart: null,          // timestamp when gaze left center
+      faceMissingStart: null,       // timestamp when face disappeared
+      violations: [],               // stored violations
+      violationMedia: [],           // captured evidence (screenshots)
+
+      // Hand detection
+      handLandmarker: null,
+      handLandmarkerReady: false,
+      handNearFaceStart: null,       // timestamp when hand first near face
+      handNearFace: false,
+
+      // Multiple faces
+      multipleFaces: false,
+
+      // Thresholds (ms)
+      GAZE_AWAY_THRESHOLD: 5000,
+      FACE_MISSING_THRESHOLD: 3000,
+      HAND_NEAR_FACE_THRESHOLD: 5000,
+
+      // UI elements
+      gazeStatusEl: null,
+      faceIndicatorEl: null,
+      handIndicatorEl: null,
+      multifaceEl: null,
+
+      init(video) {
+        this.canvas = document.getElementById('monitor-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.gazeStatusEl = document.getElementById('cam-gaze-status');
+        this.faceIndicatorEl = document.getElementById('cam-face-indicator');
+        this.handIndicatorEl = document.getElementById('cam-hand-indicator');
+        this.multifaceEl = document.getElementById('cam-multiface');
+        this.videoRef = video;
+
+        video.addEventListener('loadedmetadata', () => {
+          this.canvas.width = video.videoWidth;
+          this.canvas.height = video.videoHeight;
+        });
+        if (video.videoWidth) {
+          this.canvas.width = video.videoWidth;
+          this.canvas.height = video.videoHeight;
+        }
+
+        // Initialize MediaPipe detectors
+        this._initFaceDetector();
+        this._initHandLandmarker();
+      },
+
+      async _initFaceDetector() {
+        const initDetector = async () => {
+          try {
+            const { FilesetResolver, FaceDetector } = window._MPVision;
+            const vision = await FilesetResolver.forVisionTasks(
+              'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm'
+            );
+            this.faceDetector = await FaceDetector.createFromOptions(vision, {
+              baseOptions: {
+                modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite',
+                delegate: 'GPU',
+              },
+              runningMode: 'VIDEO',
+              minDetectionConfidence: 0.5,
+            });
+            this.faceDetectorReady = true;
+            console.log('[MONITOR] MediaPipe FaceDetector initialized');
+          } catch (err) {
+            console.error('[MONITOR] FaceDetector init failed:', err);
+          }
+        };
+
+        if (window._MPVision) {
+          await initDetector();
+        } else {
+          window.addEventListener('mediapipe-ready', () => initDetector(), { once: true });
+        }
+      },
+
+      async _initHandLandmarker() {
+        const initHand = async () => {
+          try {
+            const { FilesetResolver, HandLandmarker } = window._MPVision;
+            const vision = await FilesetResolver.forVisionTasks(
+              'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm'
+            );
+            this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
+              baseOptions: {
+                modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+                delegate: 'GPU',
+              },
+              runningMode: 'VIDEO',
+              numHands: 2,
+              minHandDetectionConfidence: 0.5,
+            });
+            this.handLandmarkerReady = true;
+            console.log('[MONITOR] MediaPipe HandLandmarker initialized');
+          } catch (err) {
+            console.error('[MONITOR] HandLandmarker init failed:', err);
+          }
+        };
+
+        if (window._MPVision) {
+          await initHand();
+        } else {
+          window.addEventListener('mediapipe-ready', () => initHand(), { once: true });
+        }
+      },
+
+      _detectFace(video, tickTime) {
+        if (!this.faceDetectorReady || !this.faceDetector) return;
+        if (video.readyState < 2) return;
+
+        try {
+          const result = this.faceDetector.detectForVideo(video, tickTime);
+          const detections = result.detections || [];
+          const currentTime = Date.now();
+
+          // Multiple faces check
+          if (detections.length > 1) {
+            if (!this.multipleFaces) {
+              this.multipleFaces = true;
+              this._triggerViolation('multiplePersonsDetected', detections.length + ' faces detected in frame');
+            }
+            this.multifaceEl.textContent = 'Faces: ' + detections.length;
+            this.multifaceEl.classList.add('active');
+          } else {
+            this.multipleFaces = false;
+            this.multifaceEl.classList.remove('active');
+          }
+
+          if (detections.length > 0) {
+            // Face is present
+            this.facePresent = true;
+            this.faceMissingStart = null;
+            this.faceIndicatorEl.textContent = 'Face: Detected';
+            this.faceIndicatorEl.classList.remove('missing');
+
+            // Estimate gaze from keypoints
+            const face = detections[0];
+            this._estimateGaze(face);
+
+            // Store face bounding box for hand proximity check
+            this._lastFaceBBox = face.boundingBox || null;
+          } else {
+            // No face detected
+            this.facePresent = false;
+            this.gazeDirection = 'away';
+            this.faceIndicatorEl.textContent = 'Face: Not detected';
+            this.faceIndicatorEl.classList.add('missing');
+            this._lastFaceBBox = null;
+
+            // Track face missing duration
+            if (!this.faceMissingStart) {
+              this.faceMissingStart = currentTime;
+            } else if (currentTime - this.faceMissingStart >= this.FACE_MISSING_THRESHOLD) {
+              this._triggerViolation('faceMissing', 'Face not detected for ' + Math.round((currentTime - this.faceMissingStart) / 1000) + 's');
+              this.faceMissingStart = currentTime;
+            }
+
+            // Also reset gaze tracking since no face
+            this.gazeAwayStart = this.gazeAwayStart || currentTime;
+
+            this._updateGazeUI();
+          }
+        } catch (err) {
+          // Silently skip detection errors
+        }
+      },
+
+      _detectHands(video, tickTime) {
+        if (!this.handLandmarkerReady || !this.handLandmarker) return;
+        if (video.readyState < 2) return;
+
+        try {
+          const result = this.handLandmarker.detectForVideo(video, tickTime);
+          const hands = result.landmarks || [];
+          const currentTime = Date.now();
+
+          if (hands.length === 0) {
+            // No hands detected
+            this.handNearFace = false;
+            this.handNearFaceStart = null;
+            this.handIndicatorEl.textContent = 'Hands: None';
+            this.handIndicatorEl.classList.remove('near-face', 'violation');
+            return;
+          }
+
+          // Check if any hand is near face region
+          // Face bounding box from face detector (normalized 0-1 coords)
+          const fb = this._lastFaceBBox;
+          let nearFace = false;
+
+          if (fb) {
+            // Expand face region slightly for proximity detection
+            const faceLeft = (fb.originX / (this.canvas.width || 640)) - 0.05;
+            const faceRight = ((fb.originX + fb.width) / (this.canvas.width || 640)) + 0.05;
+            const faceTop = (fb.originY / (this.canvas.height || 480)) - 0.05;
+            const faceBottom = ((fb.originY + fb.height) / (this.canvas.height || 480)) + 0.15;
+
+            for (const hand of hands) {
+              // Check wrist (0), index tip (8), middle tip (12) landmarks
+              for (const idx of [0, 8, 12]) {
+                if (idx < hand.length) {
+                  const lm = hand[idx];
+                  if (lm.x >= faceLeft && lm.x <= faceRight &&
+                      lm.y >= faceTop && lm.y <= faceBottom) {
+                    nearFace = true;
+                    break;
+                  }
+                }
+              }
+              if (nearFace) break;
+            }
+          }
+
+          if (nearFace) {
+            this.handNearFace = true;
+            this.handIndicatorEl.textContent = 'Hands: Near face';
+            this.handIndicatorEl.classList.add('near-face');
+
+            if (!this.handNearFaceStart) {
+              this.handNearFaceStart = currentTime;
+            } else if (currentTime - this.handNearFaceStart >= this.HAND_NEAR_FACE_THRESHOLD) {
+              this.handIndicatorEl.classList.add('violation');
+              this._triggerViolation('possibleReadingAssist', 'Hand near face for ' + Math.round((currentTime - this.handNearFaceStart) / 1000) + 's');
+              this.handNearFaceStart = currentTime; // Reset for next trigger
+            }
+          } else {
+            this.handNearFace = false;
+            this.handNearFaceStart = null;
+            this.handIndicatorEl.textContent = 'Hands: ' + hands.length;
+            this.handIndicatorEl.classList.remove('near-face', 'violation');
+          }
+        } catch (err) {
+          // Silently skip hand detection errors
+        }
+      },
+
+      _estimateGaze(face) {
+        // MediaPipe face detector keypoints (indices):
+        // 0: left eye, 1: right eye, 2: nose tip, 3: mouth center, 4: left ear tragion, 5: right ear tragion
+        const kp = face.keypoints;
+        if (!kp || kp.length < 6) return;
+
+        const leftEye = kp[0];
+        const rightEye = kp[1];
+        const nose = kp[2];
+        const leftEar = kp[4];
+        const rightEar = kp[5];
+
+        // Note: x coordinates are normalized 0-1. Since video is mirrored (scaleX(-1)),
+        // but keypoints refer to the original frame. leftEye.x > rightEye.x in original.
+
+        // Calculate face width (ear-to-ear) for normalization
+        const faceWidth = Math.abs(rightEar.x - leftEar.x) || 0.1;
+
+        // Nose position relative to eye midpoint
+        const eyeMidX = (leftEye.x + rightEye.x) / 2;
+        const eyeMidY = (leftEye.y + rightEye.y) / 2;
+
+        // Horizontal offset: how far nose is from eye center (normalized by face width)
+        const horizOffset = (nose.x - eyeMidX) / faceWidth;
+
+        // Vertical offset: nose below eye center (normalized by face width)
+        const vertOffset = (nose.y - eyeMidY) / faceWidth;
+
+        // Ear symmetry: if one ear is much further from nose, head is turned
+        const leftEarDist = Math.abs(nose.x - leftEar.x);
+        const rightEarDist = Math.abs(nose.x - rightEar.x);
+        const earRatio = leftEarDist / (rightEarDist || 0.01);
+
+        let direction = 'center';
+        const currentTime = Date.now();
+
+        // Detect looking left (in mirrored view, actual right turn)
+        if (earRatio > 2.0 || horizOffset < -0.15) {
+          direction = 'left';
+        }
+        // Detect looking right (in mirrored view, actual left turn)
+        else if (earRatio < 0.5 || horizOffset > 0.15) {
+          direction = 'right';
+        }
+        // Detect looking down
+        else if (vertOffset > 0.55) {
+          direction = 'down';
+        }
+
+        this.gazeDirection = direction;
+
+        // Track gaze-away duration
+        if (direction !== 'center') {
+          if (!this.gazeAwayStart) {
+            this.gazeAwayStart = currentTime;
+          } else if (currentTime - this.gazeAwayStart >= this.GAZE_AWAY_THRESHOLD) {
+            this._triggerViolation('suspiciousLookAway', 'Looking ' + direction + ' for ' + Math.round((currentTime - this.gazeAwayStart) / 1000) + 's');
+            this.gazeAwayStart = currentTime; // Reset so it triggers again if still looking away
+          }
+        } else {
+          // Looking at camera — reset gaze timer
+          this.gazeAwayStart = null;
+        }
+
+        this._updateGazeUI();
+      },
+
+      _updateGazeUI() {
+        const el = this.gazeStatusEl;
+        const dir = this.gazeDirection;
+        const dirLabels = { center: 'Center', left: 'Left', right: 'Right', down: 'Down', away: 'Away' };
+        el.textContent = 'Gaze: ' + (dirLabels[dir] || dir);
+
+        el.classList.remove('warning', 'danger');
+        if (dir === 'center') {
+          // All good
+        } else if (this.gazeAwayStart && (Date.now() - this.gazeAwayStart > 3000)) {
+          el.classList.add('danger');
+        } else if (dir !== 'center') {
+          el.classList.add('warning');
+        }
+      },
+
+      captureViolationMedia(violationType) {
+        if (!this.videoRef || this.videoRef.readyState < 2) return null;
+
+        // Capture snapshot from video via canvas
+        this.ctx.drawImage(this.videoRef, 0, 0, this.canvas.width, this.canvas.height);
+        const snapshot = this.canvas.toDataURL('image/jpeg', 0.8);
+
+        const evidence = {
+          violationType: violationType,
+          mediaType: 'image/jpeg',
+          data: snapshot,
+          timestamp: new Date().toISOString(),
+          frameNumber: this.frameCount,
+        };
+
+        this.violationMedia.push(evidence);
+        console.log('[MONITOR] Evidence captured for', violationType, '| Total evidence:', this.violationMedia.length);
+        return evidence;
+      },
+
+      async _uploadViolation(type, timestamp, evidence, retry) {
+        if (!interviewId || !token) return;
+
+        try {
+          const formData = new FormData();
+          formData.append('violationType', type);
+          formData.append('timestamp', timestamp);
+          formData.append('interviewId', String(interviewId));
+
+          // Convert base64 snapshot to Blob and attach as file
+          if (evidence && evidence.data) {
+            const parts = evidence.data.split(',');
+            const mime = parts[0].match(/:(.*?);/)[1];
+            const raw = atob(parts[1]);
+            const arr = new Uint8Array(raw.length);
+            for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+            const blob = new Blob([arr], { type: mime });
+            formData.append('media', blob, 'violation_' + Date.now() + '.jpg');
+          }
+
+          const resp = await fetch(API + '/monitoring/violation', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: formData,
+          });
+
+          if (resp.ok) {
+            console.log('[MONITOR] Violation uploaded:', type);
+          } else {
+            throw new Error('HTTP ' + resp.status);
+          }
+        } catch (err) {
+          if (!retry) {
+            console.warn('[MONITOR] Upload failed, retrying once:', err.message);
+            setTimeout(() => this._uploadViolation(type, timestamp, evidence, true), 2000);
+          } else {
+            console.error('[MONITOR] Upload failed after retry:', type, err.message);
+          }
+        }
+      },
+
+      _triggerViolation(type, detail) {
+        // Capture evidence screenshot before logging
+        const evidence = this.captureViolationMedia(type);
+        const timestamp = new Date().toISOString();
+
+        const violation = {
+          type: type,
+          detail: detail,
+          timestamp: timestamp,
+          hasEvidence: !!evidence,
+        };
+        this.violations.push(violation);
+        console.warn('[MONITOR] VIOLATION:', type, '-', detail);
+        console.log('[MONITOR] Total violations:', this.violations.length);
+
+        // Upload to backend (non-blocking, does not interrupt interview)
+        this._uploadViolation(type, timestamp, evidence, false);
+      },
+
+      start(video) {
+        this.init(video);
+        this.interval = setInterval(() => {
+          if (video.readyState < 2) return;
+
+          // Shared timestamp for both detectors (avoids timing issues)
+          const tickTime = performance.now();
+
+          // Run face detection (includes multi-face check)
+          this._detectFace(video, tickTime);
+
+          // Run hand detection (lightweight, every tick)
+          this._detectHands(video, tickTime);
+
+          // Draw frame to canvas
+          this.ctx.drawImage(video, 0, 0, this.canvas.width, this.canvas.height);
+
+          // Capture and store temporarily
+          const frameData = this.canvas.toDataURL('image/jpeg', 0.5);
+          this.frames.push({
+            data: frameData,
+            timestamp: new Date().toISOString(),
+            frameNumber: this.frameCount,
+            gazeDirection: this.gazeDirection,
+            facePresent: this.facePresent,
+            handNearFace: this.handNearFace,
+            multipleFaces: this.multipleFaces,
+          });
+          this.frameCount++;
+
+          // Circular buffer
+          if (this.frames.length > this.maxBuffer) {
+            this.frames.shift();
+          }
+
+
+          // Update counter
+          document.getElementById('cam-frame-count').textContent = this.frameCount + ' frames';
+        }, 1000);
+
+        console.log('[MONITOR] CameraMonitor started (1 frame/sec, buffer=' + this.maxBuffer + ', face+hand detection enabled)');
+      },
+
+      stop() {
+        if (this.interval) {
+          clearInterval(this.interval);
+          this.interval = null;
+        }
+        if (this.faceDetector) {
+          this.faceDetector.close();
+          this.faceDetector = null;
+          this.faceDetectorReady = false;
+        }
+        if (this.handLandmarker) {
+          this.handLandmarker.close();
+          this.handLandmarker = null;
+          this.handLandmarkerReady = false;
+        }
+        console.log('[MONITOR] CameraMonitor stopped. Total frames:', this.frameCount, '| Violations:', this.violations.length);
+        if (this.violations.length > 0) {
+          console.table(this.violations);
+        }
+      },
+
+      getFrames() {
+        return this.frames;
+      },
+
+      getLatestFrame() {
+        return this.frames.length > 0 ? this.frames[this.frames.length - 1] : null;
+      },
+
+      clearFrames() {
+        this.frames = [];
+      },
+
+      getViolations() {
+        return this.violations;
+      },
+
+      getViolationMedia() {
+        return this.violationMedia;
+      },
+    };
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: isVoiceMode });
+        const video = document.getElementById('video');
+        video.srcObject = stream;
+
+        // Start frame capture monitoring
+        video.addEventListener('playing', () => {
+          CameraMonitor.start(video);
+        }, { once: true });
+        return true;
+      } catch (err) {
+        console.error('[MONITOR] Camera access failed:', err);
+        // Show visible feedback
+        const camLabel = document.querySelector('.cam-label');
+        if (camLabel) { camLabel.textContent = 'Camera unavailable'; camLabel.style.color = '#ff6b6b'; }
+        const gazeEl = document.getElementById('cam-gaze-status');
+        if (gazeEl) gazeEl.textContent = 'Camera off';
+        const faceEl = document.getElementById('cam-face-indicator');
+        if (faceEl) { faceEl.textContent = 'No camera'; faceEl.classList.add('missing'); }
+        return false;
+      }
+    }
+
+    // ==================== END INTERVIEW ====================
+    async function endInterview() {
+      document.getElementById('interview-ui').style.display = 'none';
+      document.getElementById('loading-screen').style.display = 'flex';
+      document.getElementById('loading-msg').textContent = 'AI is evaluating your answers...';
+      document.getElementById('end-btn').style.display = 'none';
+      window.speechSynthesis.cancel();
+      if (isListening) stopListening();
+      cancelAutoSubmit();
+      CameraMonitor.stop();
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      try {
+        const res = await fetch(API + '/interview/end', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ interviewId }),
+        });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('lastResult', JSON.stringify(data.data));
+          window.location.href = 'summary.html?id=' + interviewId;
+        } else {
+          showError(data.error);
+          document.getElementById('loading-screen').style.display = 'none';
+        }
+      } catch {
+        showError('Failed to end interview.');
+        document.getElementById('loading-screen').style.display = 'none';
+      }
+    }
+
+    // ==================== INIT ====================
+    async function init() {
+      // Set up mode UI
+      const modeBadge = document.getElementById('mode-badge');
+      if (isVoiceMode) {
+        modeBadge.textContent = 'VOICE';
+        modeBadge.className = 'mode-badge voice';
+        document.getElementById('voice-area').style.display = 'block';
+        document.getElementById('text-area').style.display = 'none';
+        initRecognition();
+      } else {
+        modeBadge.textContent = 'TEXT';
+        modeBadge.className = 'mode-badge text';
+        document.getElementById('voice-area').style.display = 'none';
+        document.getElementById('text-area').style.display = 'flex';
+      }
+
+      // Ensure voices are loaded for speechSynthesis
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+      }
+
+      const cameraOk = await startCamera();
+      if (!cameraOk) {
+        document.getElementById('loading-screen').style.display = 'none';
+        showError('Camera permission is required for the interview. Redirecting to permission check...');
+        setTimeout(() => window.location.href = 'camera.html', 2000);
+        return;
+      }
+
+      try {
+        const res = await fetch(API + '/interview/start', { method: 'POST', headers: authHeaders() });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success) {
+          document.getElementById('loading-screen').style.display = 'none';
+          showError(data.error);
+          setTimeout(() => window.location.href = 'student-dashboard.html', 3000);
+          return;
+        }
+        interviewId = Number(data.data.interviewId);
+        questions = data.data.questions;
+        totalQuestions = data.data.totalQuestions;
+
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('interview-ui').style.display = 'flex';
+        document.getElementById('end-btn').style.display = 'inline-block';
+        renderQuestion();
+      } catch {
+        document.getElementById('loading-msg').textContent = 'Cannot connect to server.';
+      }
+    }
+
+    // Keyboard shortcut: Space to toggle listening in voice mode
+    document.addEventListener('keydown', (e) => {
+      if (!isVoiceMode) return;
+      // Ignore if typing in textarea
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleListening();
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

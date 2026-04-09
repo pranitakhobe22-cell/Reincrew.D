@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Camera & Mic Check</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1e293b;min-height:100vh;display:flex;flex-direction:column}
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:#ffffff;border-bottom:1px solid #e2e8f0}
+    .navbar .logo{font-size:1.3rem;font-weight:700;color:#0f172a}
+    .navbar .logo span{color:#7a9ebf}
+    .nav-links{display:flex;gap:20px;align-items:center}
+    .nav-links a{color:#64748b;text-decoration:none;font-size:.9rem;transition:color .2s}
+    .nav-links a:hover{color:#7a9ebf}
+    .nav-links .logout{color:#ff6b6b;cursor:pointer;background:none;border:none;font-size:.9rem;font-family:inherit}
+
+    .main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+    .container{max-width:620px;width:100%;text-align:center}
+    .page-title{font-size:1.5rem;color:#0f172a;margin-bottom:8px}
+    .page-sub{color:#64748b;font-size:.9rem;margin-bottom:32px}
+
+    .video-box{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px;position:relative}
+    video{width:100%;display:block;border-radius:12px;transform:scaleX(-1)}
+    .video-placeholder{padding:80px 20px;color:#64748b}
+
+    /* Mic level bar */
+    .mic-level-wrap{position:absolute;bottom:12px;left:12px;right:12px;height:6px;background:#e2e8f0;border-radius:4px;overflow:hidden}
+    .mic-level-fill{height:100%;background:#7a9ebf;border-radius:4px;transition:width .1s;width:0%}
+
+    .checklist{text-align:left;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin-bottom:24px}
+    .check-item{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:.9rem}
+    .check-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;font-weight:700}
+    .check-icon.pass{background:#dcfce7;color:#166534}
+    .check-icon.fail{background:#fee2e2;color:#991b1b}
+    .check-icon.pending{background:#f1f5f9;color:#94a3b8}
+    .check-hint{font-size:.75rem;color:#94a3b8;margin-left:32px;margin-top:-4px;margin-bottom:4px}
+
+    /* Mode selector */
+    .mode-section{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin-bottom:24px;text-align:left}
+    .mode-section h4{color:#0f172a;font-size:.95rem;margin-bottom:14px}
+    .mode-options{display:flex;gap:10px}
+    .mode-opt{flex:1;padding:14px;border-radius:10px;border:2px solid #e2e8f0;cursor:pointer;text-align:center;transition:all .2s}
+    .mode-opt:hover{border-color:#7a9ebf44}
+    .mode-opt.selected{border-color:#7a9ebf;background:#7a9ebf11}
+    .mode-opt .mode-icon{font-size:1.5rem;margin-bottom:6px}
+    .mode-opt .mode-label{font-size:.9rem;font-weight:600;color:#0f172a}
+    .mode-opt .mode-desc{font-size:.75rem;color:#64748b;margin-top:4px}
+
+    .actions{display:flex;gap:12px}
+    .btn{flex:1;padding:12px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+    .btn.primary{background:#7a9ebf;color:#fff}
+    .btn.primary:hover{background:#5a52e0}
+    .btn.primary:disabled{background:#3a3a4a;cursor:not-allowed}
+    .btn.secondary{background:transparent;color:#64748b;border:1px solid #cbd5e1}
+    .btn.secondary:hover{border-color:#7a9ebf;color:#7a9ebf}
+
+    .msg{padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:16px}
+    .msg.error{background:#fee2e2;border:1px solid #fecaca;color:#dc2626}
+    .msg.warn{background:#fef9c3;border:1px solid #fde047;color:#854d0e}
+
+    .retry-btn{padding:8px 18px;background:#f1f5f9;color:#7a9ebf;border:1px solid #7a9ebf;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;margin-top:12px;transition:all .2s}
+    .retry-btn:hover{background:#7a9ebf;color:#fff}
+
+    .canvas-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border-radius:12px}
+    .capture-badge{position:absolute;top:10px;right:10px;background:#0a0a0fcc;padding:4px 10px;border-radius:6px;font-size:.75rem;color:#6bff8b;display:none;align-items:center;gap:5px}
+    .capture-dot{width:6px;height:6px;border-radius:50%;background:#6bff8b;animation:blink 1.5s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .frame-count{position:absolute;bottom:24px;right:10px;background:#0a0a0fcc;padding:3px 8px;border-radius:4px;font-size:.7rem;color:#888;display:none}
+
+    @media(max-width:640px){.navbar{padding:12px 16px;flex-direction:column;gap:10px}.actions{flex-direction:column}.mode-options{flex-direction:column}}
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <nav class="navbar">
+    <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="Logo">
+        Reincrew<span>.AI</span></div>
+    <div class="nav-links">
+      <a href="student-dashboard.html">Dashboard</a>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="container">
+      <h1 class="page-title">Pre-Interview Check</h1>
+      <p class="page-sub">We need camera and microphone access to run your interview. All checks must pass before proceeding.</p>
+
+      <div id="error-msg" style="display:none" class="msg error"></div>
+      <div id="warn-msg" style="display:none" class="msg warn"></div>
+
+      <div class="video-box">
+        <div class="video-placeholder" id="video-placeholder">Requesting camera & microphone access...</div>
+        <video id="video" autoplay playsinline style="display:none"></video>
+        <canvas class="canvas-overlay" id="canvas-overlay"></canvas>
+        <div class="capture-badge" id="capture-badge"><span class="capture-dot"></span> Monitoring Active</div>
+        <div class="frame-count" id="frame-count">0 frames</div>
+        <div class="mic-level-wrap" id="mic-level-wrap" style="display:none">
+          <div class="mic-level-fill" id="mic-level-fill"></div>
+        </div>
+      </div>
+
+      <div class="checklist">
+        <div class="check-item">
+          <div class="check-icon pending" id="chk-camera">-</div>
+          <span>Camera is working</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon pending" id="chk-mic">-</div>
+          <span>Microphone is working</span>
+        </div>
+        <div class="check-hint" id="mic-hint">Speak to test your microphone</div>
+        <div class="check-item">
+          <div class="check-icon pending" id="chk-speech">-</div>
+          <span>Speech recognition supported</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon pending" id="chk-light">-</div>
+          <span>Good lighting conditions</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon pending" id="chk-monitor">-</div>
+          <span>Frame capture ready</span>
+        </div>
+      </div>
+
+      <!-- Interview Mode Selector -->
+      <div class="mode-section">
+        <h4>Choose Interview Mode</h4>
+        <div class="mode-options">
+          <div class="mode-opt selected" id="mode-voice" onclick="selectMode('voice')">
+            <div class="mode-icon">&#127908;</div>
+            <div class="mode-label">Voice Mode</div>
+            <div class="mode-desc">AI reads questions aloud. Speak your answers.</div>
+          </div>
+          <div class="mode-opt" id="mode-text" onclick="selectMode('text')">
+            <div class="mode-icon">&#9000;</div>
+            <div class="mode-label">Text Mode</div>
+            <div class="mode-desc">Read questions on screen. Type your answers.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="retry-wrap" style="display:none;text-align:center">
+        <button class="retry-btn" onclick="location.reload()">Retry Permissions</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn secondary" onclick="window.location.href='student-dashboard.html'">Back</button>
+        <button class="btn primary" id="start-btn" onclick="proceedToInterview()" disabled>Proceed to Interview</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+    let stream = null;
+    let audioCtx = null;
+    let analyser = null;
+    let micDetected = false;
+    let selectedMode = 'voice';
+    let allChecksPassed = false;
+    let captureInterval = null;
+    let capturedFrames = [];
+    let frameCount = 0;
+
+    function setCheck(id, pass) {
+      const el = document.getElementById(id);
+      el.className = 'check-icon ' + (pass ? 'pass' : 'fail');
+      el.textContent = pass ? '\u2713' : '\u2717';
+    }
+
+    function selectMode(mode) {
+      selectedMode = mode;
+      document.getElementById('mode-voice').classList.toggle('selected', mode === 'voice');
+      document.getElementById('mode-text').classList.toggle('selected', mode === 'text');
+    }
+
+    function evaluateReady() {
+      // All checks must pass to enable the button
+      const cam = document.getElementById('chk-camera').classList.contains('pass');
+      const mic = document.getElementById('chk-mic').classList.contains('pass');
+      const light = document.getElementById('chk-light').classList.contains('pass');
+      allChecksPassed = cam && mic && light;
+      document.getElementById('start-btn').disabled = !allChecksPassed;
+    }
+
+    // Monitor microphone level
+    function startMicMonitor(audioStream) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      const source = audioCtx.createMediaStreamSource(audioStream);
+      source.connect(analyser);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const fill = document.getElementById('mic-level-fill');
+      document.getElementById('mic-level-wrap').style.display = 'block';
+
+      function update() {
+        analyser.getByteFrequencyData(dataArray);
+        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        const pct = Math.min(100, (avg / 128) * 100);
+        fill.style.width = pct + '%';
+
+        // Detect speech (threshold)
+        if (pct > 8 && !micDetected) {
+          micDetected = true;
+          setCheck('chk-mic', true);
+          document.getElementById('mic-hint').textContent = 'Microphone detected!';
+          document.getElementById('mic-hint').style.color = '#6bff8b';
+          evaluateReady();
+        }
+        requestAnimationFrame(update);
+      }
+      update();
+
+      // Auto-pass mic after 5 seconds if not detected (low sensitivity)
+      setTimeout(() => {
+        if (!micDetected) {
+          micDetected = true;
+          setCheck('chk-mic', true);
+          document.getElementById('mic-hint').textContent = 'Microphone connected (speak louder for best results)';
+          document.getElementById('mic-hint').style.color = '#ffd56b';
+          evaluateReady();
+        }
+      }, 5000);
+    }
+
+    async function initDevices() {
+      try {
+        // Request both camera and mic
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+        // Camera
+        const video = document.getElementById('video');
+        video.srcObject = stream;
+        video.style.display = 'block';
+        document.getElementById('video-placeholder').style.display = 'none';
+        setCheck('chk-camera', true);
+
+        // Start frame capture
+        startFrameCapture(video);
+
+        // Mic monitoring
+        startMicMonitor(stream);
+
+        // Speech recognition check
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          setCheck('chk-speech', true);
+        } else {
+          setCheck('chk-speech', false);
+          const warn = document.getElementById('warn-msg');
+          warn.textContent = 'Speech recognition not supported in this browser. Voice mode will be unavailable. Use Chrome for best experience.';
+          warn.style.display = 'block';
+          // Force text mode
+          selectMode('text');
+          document.getElementById('mode-voice').style.opacity = '0.4';
+          document.getElementById('mode-voice').style.pointerEvents = 'none';
+        }
+
+        // Lighting check (via canvas brightness sampling)
+        setTimeout(() => {
+          checkLighting(video);
+        }, 2000);
+
+      } catch (err) {
+        document.getElementById('video-placeholder').textContent = 'Camera or microphone access denied.';
+        setCheck('chk-camera', false);
+        setCheck('chk-mic', false);
+        setCheck('chk-speech', false);
+        setCheck('chk-light', false);
+        setCheck('chk-monitor', false);
+
+        const el = document.getElementById('error-msg');
+        el.textContent = 'Camera and microphone permissions are required for the interview. Please allow access and retry.';
+        el.style.display = 'block';
+        document.getElementById('retry-wrap').style.display = 'block';
+        document.getElementById('start-btn').disabled = true;
+      }
+    }
+
+    // ==================== FRAME CAPTURE ====================
+    function startFrameCapture(video) {
+      const canvas = document.getElementById('canvas-overlay');
+      const ctx = canvas.getContext('2d');
+
+      // Match canvas to video dimensions
+      video.addEventListener('loadedmetadata', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      });
+      // Fallback if already loaded
+      if (video.videoWidth) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }
+
+      captureInterval = setInterval(() => {
+        if (video.readyState < 2) return;
+
+        // Draw current frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Capture as data URL and store temporarily
+        const frameData = canvas.toDataURL('image/jpeg', 0.6);
+        capturedFrames.push({
+          data: frameData,
+          timestamp: new Date().toISOString(),
+          frameNumber: frameCount,
+        });
+        frameCount++;
+
+        // Keep only last 30 frames in memory (30 seconds of buffer)
+        if (capturedFrames.length > 30) {
+          capturedFrames.shift();
+        }
+
+
+        // Update frame counter
+        document.getElementById('frame-count').textContent = frameCount + ' frames';
+
+        // Mark monitoring check as passed after first capture
+        if (frameCount === 1) {
+          setCheck('chk-monitor', true);
+          evaluateReady();
+        }
+      }, 1000);
+
+      // Show monitoring badge and frame counter
+      document.getElementById('capture-badge').style.display = 'flex';
+      document.getElementById('frame-count').style.display = 'block';
+
+      console.log('[MONITOR] Frame capture started (1 frame/sec)');
+    }
+
+    function stopFrameCapture() {
+      if (captureInterval) {
+        clearInterval(captureInterval);
+        captureInterval = null;
+      }
+      console.log('[MONITOR] Frame capture stopped. Total frames:', frameCount);
+    }
+
+    function checkLighting(video) {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 120;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 160, 120);
+        const imgData = ctx.getImageData(0, 0, 160, 120).data;
+
+        let totalBrightness = 0;
+        for (let i = 0; i < imgData.length; i += 4) {
+          totalBrightness += (imgData[i] * 0.299 + imgData[i+1] * 0.587 + imgData[i+2] * 0.114);
+        }
+        const avgBrightness = totalBrightness / (imgData.length / 4);
+
+        if (avgBrightness > 40) {
+          setCheck('chk-light', true);
+        } else {
+          setCheck('chk-light', false);
+          const warn = document.getElementById('warn-msg');
+          warn.textContent = 'Low lighting detected. Please improve your lighting for a better interview experience.';
+          warn.style.display = 'block';
+          // Still pass after brief delay for usability
+          setTimeout(() => { setCheck('chk-light', true); evaluateReady(); }, 3000);
+        }
+        evaluateReady();
+      } catch {
+        setCheck('chk-light', true);
+        evaluateReady();
+      }
+    }
+
+    function proceedToInterview() {
+      if (!allChecksPassed) return;
+      // Save mode preference
+      localStorage.setItem('interviewMode', selectedMode);
+      // Stop frame capture
+      stopFrameCapture();
+      // Clear pre-check frames (interview will capture its own)
+      capturedFrames = [];
+      // Stop streams before navigating (interview page will re-acquire)
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      if (audioCtx) audioCtx.close();
+      window.location.href = 'interview.html';
+    }
+
+    initDevices();
+  </script>
+</body>
+</html>
