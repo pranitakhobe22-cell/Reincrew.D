@@ -1,47 +1,19 @@
 "use client";
 
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
-import { Send, Sparkles, CheckCircle2, Loader2, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { Send, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 
-export default function WaitlistWidget() {
-  const [expanded, setExpanded] = useState(false);
+export default function WaitlistSection() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
-  const [hasNudged, setHasNudged] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const { scrollYProgress } = useScroll();
-
-  // Smart UX Nudge: Expand briefly when user scrolls 40% of the page
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (latest > 0.4 && !hasNudged && !expanded) {
-      setHasNudged(true);
-      setExpanded(true);
-      // Auto-close nudge after 3s if untouched
-      setTimeout(() => {
-        setExpanded((prev) => {
-          if (prev && status === "idle" && email === "") return false;
-          return prev;
-        });
-      }, 3000);
-    }
-  });
-
-  // Focus input when manually expanded
-  useEffect(() => {
-    if (expanded && inputRef.current) {
-      // Small delay to allow animation to start
-      setTimeout(() => inputRef.current?.focus(), 150);
-    }
-  }, [expanded]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
       setStatus("error");
-      setMessage("Please enter a valid email.");
+      setMessage("Please enter a valid email address.");
       return;
     }
 
@@ -56,109 +28,90 @@ export default function WaitlistWidget() {
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
-        setMessage("You'll be notified!");
+        setMessage("You're on the list! We'll be in touch soon.");
         setEmail("");
-        // Auto-minimize after success
-        setTimeout(() => {
-          setExpanded(false);
-          // reset status after minimizing
-          setTimeout(() => setStatus("idle"), 500); 
-        }, 2500);
       } else {
         setStatus("error");
         setMessage(data.message || "Something went wrong.");
       }
-    } catch (err) {
+    } catch (_err) {
       setStatus("error");
-      setMessage("Server error. Please try again.");
+      setMessage("Server error. Please try again later.");
     }
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      <AnimatePresence>
-        {expanded ? (
-          <motion.div
-            key="expanded"
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="bg-white/95 backdrop-blur-xl border border-[#e2e8f0] shadow-2xl rounded-2xl p-5 mb-4 w-[320px] origin-bottom-right"
-          >
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-serif font-bold text-lg text-[#1E293B]">Get Early Access</h4>
-              <button 
-                onClick={() => setExpanded(false)}
-                className="text-slate-400 hover:text-slate-700 transition"
-                aria-label="Close"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            
-            <p className="text-sm text-slate-500 mb-4 font-dm">
-              Join the waitlist to be notified when Reincrew.AI goes live.
-            </p>
+    <section className="w-full px-[8%] py-24 flex justify-center relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-5xl bg-indigo-50/40 backdrop-blur-xl border border-indigo-100/60 rounded-[3rem] p-10 md:p-16 text-center shadow-2xl shadow-indigo-900/5 relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-100/40 via-white/40 to-indigo-50/20" />
+        
+        {/* Decorative elements */}
+        <div className="absolute -top-10 -left-10 text-indigo-200/40 transform -rotate-12">
+          <Sparkles size={120} />
+        </div>
+        <div className="absolute -bottom-10 -right-10 text-indigo-200/40 transform rotate-12">
+          <Sparkles size={120} />
+        </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-              {status === "success" ? (
-                <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
-                  <CheckCircle2 size={18} />
-                  <span className="font-medium text-sm font-dm">{message}</span>
-                </div>
-              ) : (
-                <>
-                  <input
-                    ref={inputRef}
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-sm transition-all text-[#1E293B]"
-                    disabled={status === "loading"}
-                  />
-                  <button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="w-full py-2.5 rounded-xl bg-[#7a9ebf] hover:bg-[#6a8daf] text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-70 font-sans shadow-md"
-                  >
-                    {status === "loading" ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <>Get Early Access <Send size={14} /></>
-                    )}
-                  </button>
-                  {status === "error" && (
-                    <span className="text-red-500 text-xs mt-1 px-1 font-medium font-dm">{message}</span>
-                  )}
-                </>
-              )}
-            </form>
-          </motion.div>
-        ) : (
-          <motion.button
-            key="minimized"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setExpanded(true)}
-            className="w-14 h-14 bg-[#7a9ebf] text-white rounded-full flex items-center justify-center shadow-xl hover:shadow-[0_0_20px_rgba(122,158,191,0.5)] transition-shadow border-2 border-white/20 group relative"
-          >
-            {/* Subtle glow pulse */}
-            <div className="absolute inset-0 rounded-full border-2 border-white/40 animate-ping opacity-20 group-hover:opacity-0 transition-opacity" style={{ animationDuration: '3s' }} />
-            
-            <motion.div
-               animate={{ rotate: [0, 10, -10, 0] }}
-               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        <div className="relative z-10 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm mb-6">
+            <Sparkles size={16} /> Beta Access
+          </div>
+
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#1E293B] mb-6 leading-tight tracking-tight">
+            Reserve Your Spot for Early Access
+          </h2>
+          <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-xl mx-auto font-medium leading-relaxed">
+            Join the waitlist to be among the first to experience the future of AI-driven job interviews and candidate screening.
+          </p>
+
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto relative">
+            <div className="flex-1">
+              <input
+                type="email"
+                placeholder="Enter your work email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full h-14 px-6 rounded-2xl border border-slate-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 shadow-sm transition-all text-[#1E293B] text-base placeholder:text-slate-400"
+                disabled={status === "loading" || status === "success"}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={status === "loading" || status === "success"}
+              className="h-14 px-8 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base flex items-center justify-center gap-3 transition-colors disabled:opacity-70 shadow-lg shadow-indigo-600/20 whitespace-nowrap"
             >
-              <Sparkles size={24} className="group-hover:animate-pulse" />
+              {status === "loading" ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : status === "success" ? (
+                <><CheckCircle2 size={20} /> Joined</>
+              ) : (
+                <>Get Early Access <Send size={18} /></>
+              )}
+            </button>
+            {status === "error" && (
+              <span className="absolute -bottom-8 left-0 right-0 text-red-500 text-sm font-medium">{message}</span>
+            )}
+          </form>
+
+          {status === "success" && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center gap-2 mt-6 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200 shadow-sm font-medium text-sm"
+            >
+              <CheckCircle2 size={16} />
+              {message}
             </motion.div>
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </div>
+          )}
+        </div>
+      </motion.div>
+    </section>
   );
 }

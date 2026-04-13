@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const TOTAL_SLIDES = 6;
 const SLIDE_DURATION = 1500;
 
 export default function InteractiveRobot() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(3);
   const [bootLines, setBootLines] = useState<string[]>([]);
   const [showBootScreen, setShowBootScreen] = useState(true);
   const [bootStep, setBootStep] = useState(0);
   const [isHoveringMonitor, setIsHoveringMonitor] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Refs for elements responding to mouse tracker
   const headPivotRef = useRef<HTMLDivElement>(null);
@@ -23,8 +25,11 @@ export default function InteractiveRobot() {
   const shouldersRef = useRef<HTMLDivElement>(null);
   const eyeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  useEffect(() => {
-    // Initial Boot Sequence
+  const runBootSequence = useCallback(async () => {
+    if (hasEntered) return;
+    setHasEntered(true);
+
+    // Boot step animations
     const timer1 = setTimeout(() => setBootStep(1), 300);
     const timer2 = setTimeout(() => setBootStep(2), 700);
     const timer3 = setTimeout(() => setBootStep(3), 1100);
@@ -36,32 +41,44 @@ export default function InteractiveRobot() {
       "> Welcome to Reincrew.ai"
     ];
 
-    const runBootText = async () => {
-      await new Promise(r => setTimeout(r, 1600));
-      for (let i = 0; i < fullLines.length; i++) {
-        setBootLines(prev => [...prev, ""]);
-        for (let char of fullLines[i]) {
-          setBootLines(prev => {
-            const next = [...prev];
-            next[i] += char;
-            return next;
-          });
-          await new Promise(r => setTimeout(r, 30));
-        }
-        await new Promise(r => setTimeout(r, 250));
+    await new Promise(r => setTimeout(r, 1200));
+    for (let i = 0; i < fullLines.length; i++) {
+      setBootLines(prev => [...prev, ""]);
+      for (const char of fullLines[i]) {
+        setBootLines(prev => {
+          const next = [...prev];
+          next[i] += char;
+          return next;
+        });
+        await new Promise(r => setTimeout(r, 30));
       }
-      await new Promise(r => setTimeout(r, 600));
-      setShowBootScreen(false);
-    };
-
-    runBootText();
+      await new Promise(r => setTimeout(r, 200));
+    }
+    await new Promise(r => setTimeout(r, 400));
+    setShowBootScreen(false);
+    // Jump straight to slide 3 (interview + insights visible immediately)
+    setCurrentSlide(3);
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, []);
+  }, [hasEntered]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          runBootSequence();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [runBootSequence]);
 
   useEffect(() => {
     // Mouse Parallax Interaction
@@ -134,6 +151,8 @@ export default function InteractiveRobot() {
 
   useEffect(() => {
     if (showBootScreen) return;
+    // Start cycling from slide 3 so insights are visible immediately
+    setCurrentSlide(3);
     const slideTimer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % TOTAL_SLIDES);
     }, 5000);
@@ -143,7 +162,7 @@ export default function InteractiveRobot() {
   return (
     <div 
       className="monitor-wrap" 
-      ref={monitorWrapRef}
+      ref={(el) => { monitorWrapRef.current = el; (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = el; }}
       onMouseEnter={() => setIsHoveringMonitor(true)}
       onMouseLeave={() => setIsHoveringMonitor(false)}
       style={{ zIndex: 10 }}
@@ -258,7 +277,7 @@ export default function InteractiveRobot() {
               <div className={`slide sl-iv ${currentSlide === 3 ? 'active' : currentSlide === 2 ? 'exit' : ''}`}>
                 <div className="sl-q font-serif">
                   <span className="font-sans">Question 4/10</span>
-                  <p>"Tell me about a complex project..."</p>
+                  <p>&quot;Tell me about a complex project...&quot;</p>
                 </div>
                 <div className="sl-iv-body">
                   <div className="sl-vid">

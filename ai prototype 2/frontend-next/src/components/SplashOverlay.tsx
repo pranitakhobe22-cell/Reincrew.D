@@ -12,7 +12,7 @@ export default function SplashOverlay({ onFinish }: SplashOverlayProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onFinish();
-    }, 2200); // Slightly faster to feel snappier
+    }, 1500); // Snappier start
 
     return () => clearTimeout(timer);
   }, [onFinish]);
@@ -20,9 +20,13 @@ export default function SplashOverlay({ onFinish }: SplashOverlayProps) {
   return (
     <motion.div 
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white"
+      exit={{ 
+        opacity: 0,
+        filter: "blur(20px)",
+        scale: 1.1
+      }}
+      transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+      className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-white"
     >
       <div className="relative">
         {/* Subtle pulsing glow */}
@@ -44,7 +48,10 @@ export default function SplashOverlay({ onFinish }: SplashOverlayProps) {
           }}
           className="relative z-10"
         >
-          <Logo size={100} className="flex-col !gap-5" />
+          <Logo 
+            hideIcon={false} 
+            className="flex-col gap-5! scale-[2.5]" 
+          />
         </motion.div>
       </div>
     </motion.div>

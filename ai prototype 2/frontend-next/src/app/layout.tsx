@@ -1,24 +1,17 @@
-import { Inter, Crimson_Pro, DM_Sans, Outfit } from "next/font/google";
+import { Roboto_Slab, Bricolage_Grotesque } from "next/font/google";
+import { Metadata } from "next";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const robotoSlab = Roboto_Slab({
+  variable: "--font-serif",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const crimsonPro = Crimson_Pro({
-  variable: "--font-crimson",
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-sans",
   subsets: ["latin"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -34,9 +27,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${crimsonPro.variable} ${dmSans.variable} ${outfit.variable} h-full antialiased`}
+      className={`${robotoSlab.variable} ${bricolage.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

@@ -5,7 +5,7 @@ import InteractiveRobot from "./InteractiveRobot";
 
 export default function AboutUs() {
   return (
-    <section id="about" className="py-32 px-[8%] relative overflow-hidden bg-[#FCFCF9]">
+    <section id="about" className="py-32 px-[8%] relative overflow-hidden bg-transparent">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
         <motion.div 
           initial={{ opacity: 0, x: -30 }}
@@ -16,12 +16,12 @@ export default function AboutUs() {
           <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6">
             Meet Your AI Mentor
           </div>
-          <h2 className="text-5xl md:text-6xl font-serif text-[#1E293B] mb-8 leading-[1.1] tracking-tight font-semibold">
+          <h2 className="text-4xl md:text-5xl font-serif text-[#1E293B] mb-8 leading-[1.15] tracking-tight font-semibold">
             Intelligent Guidance,<br />
             Built into Every Context.
           </h2>
           <p className="text-xl text-text-muted mb-8 leading-relaxed font-medium">
-            Experience the power of real-time sentiment analysis and behavioral tracking. Our AI doesn't just grade you—it understands your tone, pace, and professional confidence.
+            Experience the power of real-time sentiment analysis and behavioral tracking. Our AI doesn&apos;t just grade you—it understands your tone, pace, and professional confidence.
           </p>
           <ul className="space-y-5">
             {[

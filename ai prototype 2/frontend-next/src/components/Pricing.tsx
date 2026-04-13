@@ -90,7 +90,7 @@ export default function Pricing() {
   const currentPlans = activeTab === "students" ? studentPlans : hrPlans;
 
   return (
-    <section id="pricing" className="py-32 px-[8%] relative overflow-hidden bg-white">
+    <section id="pricing" className="py-32 px-[8%] relative overflow-hidden bg-transparent">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16">
           <motion.div
@@ -105,7 +105,7 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-6xl font-serif text-[#1E293B] mb-8 font-semibold tracking-tight"
+            className="text-4xl md:text-5xl font-serif text-[#1E293B] mb-8 font-semibold tracking-tight"
           >
             Choose Your Path to Success
           </motion.h2>
@@ -113,39 +113,38 @@ export default function Pricing() {
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex items-center justify-center gap-2 text-text-muted max-w-2xl mx-auto mb-12 bg-slate-50 p-4 rounded-2xl border border-slate-100"
+            className="flex items-center justify-center gap-2 text-text-muted max-w-2xl mx-auto mb-12 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm"
           >
-            <Info size={18} className="text-primary flex-shrink-0" />
+            <Info size={18} className="text-primary shrink-0" />
             <p className="text-sm font-medium leading-relaxed italic">
               Every user receives the same unbiased AI evaluation. Pricing only reflects usage and scale, not intelligence.
             </p>
           </motion.div>
 
           <div className="flex justify-center mb-16">
-            <div className="p-1 bg-slate-100 rounded-2xl flex relative w-[300px]">
-              <motion.div
-                className="absolute inset-1 bg-white rounded-[14px] shadow-sm z-0"
-                initial={false}
-                animate={{ x: activeTab === "students" ? 0 : 146 }}
-                transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              />
-              <button
-                onClick={() => setActiveTab("students")}
-                className={`flex-1 py-3 px-6 rounded-[14px] text-sm font-bold relative z-10 transition-colors duration-200 ${
-                  activeTab === "students" ? "text-primary" : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                For Students
-              </button>
-              <button
-                onClick={() => setActiveTab("hr")}
-                className={`flex-1 py-3 px-6 rounded-[14px] text-sm font-bold relative z-10 transition-colors duration-200 ${
-                  activeTab === "hr" ? "text-primary" : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                For Recruiters
-              </button>
+            <div className="p-1.5 bg-indigo-50/50 backdrop-blur-xl rounded-full flex relative w-max border border-indigo-100/50 shadow-inner">
+              {["students", "hr"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab as "students" | "hr")}
+                  className={`relative px-8 py-3 mx-1 rounded-full text-sm font-bold transition-all duration-300 ${
+                    activeTab === tab ? "text-indigo-700" : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <span className="relative z-10">
+                    {tab === "students" ? "For Students" : "For Recruiters"}
+                  </span>
+                  {activeTab === tab && (
+                    <motion.div
+                      layoutId="pricing-active-pill"
+                      className="absolute inset-0 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-white z-0"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                    />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -161,8 +160,8 @@ export default function Pricing() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className={`relative p-10 rounded-[40px] border flex flex-col group transition-all duration-500 ${
                   plan.popular 
-                    ? "bg-slate-900 border-slate-800 shadow-2xl scale-105 z-20" 
-                    : "bg-white border-slate-100 shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(99,102,241,0.08)] z-10"
+                    ? "bg-slate-900/90 backdrop-blur-xl border-slate-700 shadow-2xl scale-105 z-20" 
+                    : "bg-white/60 backdrop-blur-xl border-white/60 shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(99,102,241,0.15)] z-10"
                 }`}
               >
                 {plan.popular && (
@@ -177,7 +176,7 @@ export default function Pricing() {
                   {plan.icon}
                 </div>
 
-                <h3 className={`text-2xl font-serif mb-2 ${plan.popular ? "text-white" : "text-slate-900"}`}>
+                <h3 className={`text-xl font-serif mb-2 ${plan.popular ? "text-white" : "text-slate-900"}`}>
                   {plan.name}
                 </h3>
                 <p className={`text-sm mb-8 leading-relaxed font-medium ${plan.popular ? "text-slate-400" : "text-text-muted"}`}>
@@ -193,7 +192,7 @@ export default function Pricing() {
                 <ul className="space-y-4 mb-10 flex-1">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <div className={`mt-1 flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${
+                      <div className={`mt-1 shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${
                         plan.popular ? "bg-primary" : "bg-primary/10"
                       }`}>
                         <Check size={10} className={plan.popular ? "text-white" : "text-primary"} />
@@ -222,9 +221,9 @@ export default function Pricing() {
            initial={{ opacity: 0, y: 30 }}
            whileInView={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.8 }}
-           className="bg-primary/10 rounded-[40px] p-12 text-center border border-primary/20"
+           className="bg-primary/10 backdrop-blur-md rounded-[40px] p-12 text-center border border-primary/20"
         >
-          <h3 className="text-2xl font-serif text-slate-900 mb-4 tracking-tight">Need something flexible?</h3>
+          <h3 className="text-xl font-serif text-slate-900 mb-4 tracking-tight">Need something flexible?</h3>
           <p className="text-slate-600 mb-8 max-w-xl mx-auto font-medium">
             Purchase interview credits that never expire. Perfect for quick mock sessions or one-off assessments.
           </p>
