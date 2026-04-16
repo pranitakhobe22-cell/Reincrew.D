@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, Lock, User, ShieldCheck, Loader2 } from 'lucide-react';
 import Logo from '@/components/Logo';
 
-const API = 'http://localhost:5555';
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5555';
 
 function LoginContent() {
   const router = useRouter();

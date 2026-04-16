@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Logo from '@/components/Logo';
 
-const API = 'http://localhost:5555';
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5555';
 
 export default function AdminPage() {
   const router = useRouter();
