@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -24,6 +24,14 @@ function LoginContent() {
     role: 'candidate'
   });
 
+  const redirectUser = useCallback((user: { role: string; onboarded: string | number }) => {
+    if (user.onboarded === 0 || user.onboarded === '0') {
+      router.push('/onboarding');
+    } else {
+      router.push(user.role === 'admin' ? '/admin' : '/dashboard');
+    }
+  }, [router]);
+
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab === 'register') setMode('register');
@@ -36,15 +44,7 @@ function LoginContent() {
         onboarded: localStorage.getItem('onboarded') || '0' 
       });
     }
-  }, [searchParams]);
-
-  const redirectUser = (user: any) => {
-    if (user.onboarded === 0 || user.onboarded === '0') {
-      router.push('/onboarding');
-    } else {
-      router.push(user.role === 'admin' ? '/admin' : '/dashboard');
-    }
-  };
+  }, [searchParams, redirectUser]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -80,7 +80,7 @@ function LoginContent() {
       localStorage.setItem('onboarded', user.onboarded || 0);
 
       redirectUser(user);
-    } catch (_err) {
+    } catch {
       setError('Cannot connect to server. Ensure backend is running.');
     } finally {
       setLoading(false);

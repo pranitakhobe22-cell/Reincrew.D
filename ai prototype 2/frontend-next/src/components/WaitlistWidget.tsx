@@ -28,13 +28,13 @@ export default function WaitlistSection() {
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
-        setMessage("You're on the list! We'll be in touch soon.");
+        setMessage("You&apos;re on the list! We&apos;ll be in touch soon.");
         setEmail("");
       } else {
         setStatus("error");
         setMessage(data.message || "Something went wrong.");
       }
-    } catch (_err) {
+    } catch {
       setStatus("error");
       setMessage("Server error. Please try again later.");
     }

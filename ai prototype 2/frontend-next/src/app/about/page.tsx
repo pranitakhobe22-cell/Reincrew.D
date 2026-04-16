@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Heart, Target, ShieldCheck, Cpu, Globe, Rocket, Users, User, BadgeCheck, Sparkles, Zap, ArrowRight, Shield, BarChart3 } from "lucide-react";
+import { Heart, Target, ShieldCheck, Cpu, Globe, Users, User, BadgeCheck, Sparkles, Zap, ArrowRight, Shield, BarChart3 } from "lucide-react";
 import SecondaryPageLayout from "@/components/SecondaryPageLayout";
 
 const VALUES = [

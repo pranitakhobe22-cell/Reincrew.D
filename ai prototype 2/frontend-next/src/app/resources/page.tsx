@@ -14,7 +14,7 @@ const RESOURCES = [
   },
   {
     title: "Resume Optimization",
-    desc: "Learn how to structure your resume to beat ATS systems and catch recruiters' attention.",
+    desc: "Learn how to structure your resume to beat ATS systems and catch recruiters&apos; attention.",
     icon: <FileText className="text-primary" size={24} />,
     tag: "Guide"
   },

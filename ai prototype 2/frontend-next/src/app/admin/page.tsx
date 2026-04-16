@@ -1,52 +1,59 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Users, 
   CheckCircle, 
   Clock, 
   BarChart3, 
-  AlertCircle, 
   Search, 
   LogOut, 
   ExternalLink,
   ChevronDown,
   RefreshCw,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from 'lucide-react';
 import Logo from '@/components/Logo';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5555';
 
+interface Interview {
+  candidateName: string;
+  candidateEmail: string;
+  status: string;
+  score: number | null;
+  summary?: string;
+  date: string;
+}
+
+interface Violation {
+  candidateName: string;
+  candidateEmail: string;
+  violationType: string;
+  timestamp: string;
+}
+
+interface Analytics {
+  totalInterviews: number;
+  completedInterviews: number;
+  inProgressInterviews: number;
+  averageScore: number;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [interviews, setInterviews] = useState<any[]>([]);
-  const [analytics, setAnalytics] = useState<any>(null);
-  const [violations, setViolations] = useState<any[]>([]);
-  const [error, setError] = useState('');
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [violations, setViolations] = useState<Violation[]>([]);
   
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-
-    if (!token || role !== 'admin') {
-      router.push('/login');
-      return;
-    }
-
-    fetchData();
-    const interval = setInterval(fetchData, 30000); // Auto-refresh 30s
-    return () => clearInterval(interval);
-  }, [router]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const token = localStorage.getItem('token');
     const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -66,12 +73,26 @@ export default function AdminPage() {
       if (intData.success) setInterviews(intData.data.interviews);
       if (anaData.success) setAnalytics(anaData.data);
       if (monData.success) setViolations(monData.data.violations || []);
-    } catch (_err) {
-      setError('Connection lost. Retrying...');
+    } catch {
+      console.error('Connection lost. Retrying...');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    if (!token || role !== 'admin') {
+      router.push('/login');
+      return;
+    }
+
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // Auto-refresh 30s
+    return () => clearInterval(interval);
+  }, [router, fetchData]);
 
   const logout = () => {
     localStorage.clear();
@@ -271,7 +292,7 @@ export default function AdminPage() {
   );
 }
 
-function StatCard({ label, value, icon }: { label: string, value: any, icon: React.ReactNode }) {
+function StatCard({ label, value, icon }: { label: string, value: string | number | null, icon: React.ReactNode }) {
   return (
     <div className="bg-card-bg p-6 rounded-3xl border border-border shadow-sm flex items-center justify-between">
       <div>
@@ -294,22 +315,4 @@ function getScoreStyle(score: number) {
 function getStatusStyle(status: string) {
   if (status === 'completed') return "bg-slate-100 text-slate-600 border-slate-200";
   return "bg-indigo-50 text-indigo-600 border-indigo-100";
-}
-
-function Loader2(props: any) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      {...props}
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  );
 }

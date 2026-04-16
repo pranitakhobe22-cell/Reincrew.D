@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -31,11 +31,11 @@ export default function Home() {
   );
 
   // Whether we arrived via a hash link (skip intro animations entirely)
-  const arrivedViaHash = useRef<boolean>(hasUrlHash());
+  const [arrivedViaHash] = useState(() => hasUrlHash());
 
   // After content mounts, scroll to the hash target
   useEffect(() => {
-    if (!arrivedViaHash.current) return;
+    if (!arrivedViaHash) return;
     const hash = window.location.hash.substring(1);
     if (!hash) return;
     // Small delay to allow sections to be rendered in the DOM
@@ -44,7 +44,7 @@ export default function Home() {
       if (element) element.scrollIntoView({ behavior: 'smooth' });
     }, 80);
     return () => clearTimeout(timer);
-  }, []);
+  }, [arrivedViaHash]);
 
   const handleSplashFinish = () => {
     setPhase('settling');
@@ -66,9 +66,9 @@ export default function Home() {
           <motion.div
             key="main"
             // No fade-in when arriving via hash — content should appear instantly
-            initial={{ opacity: arrivedViaHash.current ? 1 : 0 }}
+            initial={{ opacity: arrivedViaHash ? 1 : 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: arrivedViaHash.current ? 0 : 0.5, ease: "easeOut" }}
+            transition={{ duration: arrivedViaHash ? 0 : 0.5, ease: "easeOut" }}
             className="flex flex-col relative z-10"
           >
             <Navbar showLinks={showNavLinks} />
@@ -83,9 +83,9 @@ export default function Home() {
               <AnimatePresence>
                 {phase === 'content' && (
                   <motion.div
-                    initial={{ opacity: arrivedViaHash.current ? 1 : 0, y: arrivedViaHash.current ? 0 : 30 }}
+                    initial={{ opacity: arrivedViaHash ? 1 : 0, y: arrivedViaHash ? 0 : 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: arrivedViaHash.current ? 0 : 0.8, delay: arrivedViaHash.current ? 0 : 0.5 }}
+                    transition={{ duration: arrivedViaHash ? 0 : 0.8, delay: arrivedViaHash ? 0 : 0.5 }}
                   >
                     <div id="features"><Features /></div>
                     <div id="how-it-works"><HowItWorks /></div>
