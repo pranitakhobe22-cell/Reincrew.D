@@ -25,13 +25,13 @@ export default function Hero({
   onContentReveal: () => void
 }) {
   const [questionIdx, setQuestionIdx] = useState(0);
-  const [typingComplete, setTypingComplete] = useState(false);
 
   useEffect(() => {
-    if (typingComplete) {
+    if (phase === "content") {
+      // With the new animation, we instantly reveal without waiting for letter typing
       onContentReveal();
     }
-  }, [typingComplete, onContentReveal]);
+  }, [phase, onContentReveal]);
 
   useEffect(() => {
     if (phase === "questions") {
@@ -49,12 +49,14 @@ export default function Hero({
     }
   }, [phase, onQuestionsFinish]);
 
-  const titleText = "Master the Art of the Interview";
-  
   return (
-    <section className="relative min-h-[85vh] flex flex-col items-center justify-center px-[8%] pt-32 pb-16 overflow-hidden">
+    <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-[5%] lg:px-[8%] pt-20 pb-12 overflow-hidden">
       
-      <div className="w-full max-w-7xl mx-auto">
+      {/* Abstract Background Elements */}
+      <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl rounded-tl-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-[600px] h-[600px] bg-blue-400/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-7xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {phase === "questions" ? (
             <motion.div 
@@ -65,141 +67,125 @@ export default function Hero({
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="flex justify-center items-center h-[300px]"
             >
-              <h2 className="text-3xl md:text-4xl font-black text-primary/70 text-center tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 text-center tracking-tight">
                 {QUESTIONS[questionIdx]}
               </h2>
             </motion.div>
           ) : phase === "content" ? (
             <motion.div 
-              key="split-content"
-              initial={{ opacity: 1 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-20 items-center mt-12"
+              key="main-content"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center mt-8 w-full"
             >
-
               {/* Left: Tagline Section */}
-              <div className="lg:col-span-7">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif text-[#1E293B] leading-[1.08] mb-10 tracking-tight font-semibold flex flex-col items-start gap-2">
-                  <div className="flex flex-wrap">
-                    {"Master the Art".split("").map((char, index) => (
-                      <motion.span
-                        key={`l1-${index}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ 
-                          duration: 0.05, 
-                          delay: index * 0.04,
-                          ease: "easeIn" 
-                        }}
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </motion.span>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap text-primary">
-                    {"of the Interview".split("").map((char, index) => (
-                      <motion.span
-                        key={`l2-${index}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ 
-                          duration: 0.05, 
-                          delay: (index + 15) * 0.04, // Continue delay from line 1
-                          ease: "easeIn" 
-                        }}
-                        onAnimationComplete={() => {
-                          if (index === "of the Interview".length - 1) setTypingComplete(true);
-                        }}
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </motion.span>
-                    ))}
-                  </div>
+              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+                {/* Top Badge */}
+                <motion.div 
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-xs lg:text-sm mb-6 lg:mb-8 ring-1 ring-primary/20"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  </span>
+                  Introducing Reincrew AI Evaluator
+                </motion.div>
+
+                {/* Main Headline */}
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-[1.08] mb-6 lg:mb-8 tracking-tight max-w-4xl">
+                  Master the Art of <br className="hidden md:block" />
+                  <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-indigo-500 to-purple-600">
+                    the Interview
+                  </span>
                 </h1>
                 
+                {/* Description */}
                 <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: typingComplete ? 1 : 0, y: typingComplete ? 0 : 20 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="text-xl md:text-2xl text-text-muted max-w-2xl leading-relaxed font-dm font-medium"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="text-lg md:text-xl lg:text-2xl text-slate-600 max-w-2xl leading-relaxed mb-10 lg:mb-0 font-medium"
                 >
-                  The powerful intersection of talent and opportunity. Empowering candidates to master their interviews while helping HR teams identify top talent with hyper-realistic AI assessments.
+                  Elite career preparation meets advanced talent intelligence. Our platform uses voice AI and video analysis to score candidates with unmatched precision.
                 </motion.p>
               </div>
 
-              {/* Right: Aligned CTA Cards */}
-              <div className="lg:col-span-5 flex flex-col gap-8">
+              {/* Right: Action Cards */}
+              <div className="lg:col-span-5 flex flex-col gap-6 lg:gap-8 w-full max-w-md mx-auto lg:mx-0">
                 {/* Join Interview Card */}
                 <motion.div 
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: typingComplete ? 0 : 50, opacity: typingComplete ? 1 : 0 }}
-                  transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-                  className="w-full max-w-[420px] z-10"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6, duration: 0.6 }}
+                  className="w-full"
                 >
                   <Link
                     href="/login"
-                    className="group block p-7 rounded-[1.75rem] bg-white/60 backdrop-blur-xl border border-white/60 shadow-xl hover:shadow-2xl hover:border-indigo-500/30 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-card-bg shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-400/20 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
                   >
-                    <div className="absolute -top-10 -right-10 p-8 opacity-[0.03] group-hover:opacity-[0.06] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none">
-                       <User size={240} className="text-indigo-900" />
+                    <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] group-hover:scale-125 transition-all duration-700 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+                       <User size={240} className="text-slate-900" />
                     </div>
-                    <div className="flex flex-col items-start gap-5 relative z-10">
-                      <div className="w-14 h-14 rounded-xl bg-slate-50 text-slate-800 border border-slate-100 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
+                    
+                    <div className="flex items-center gap-4 mb-5 relative z-10">
+                      <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-border/30 text-slate-800 border border-border flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300">
                         <User size={28} />
                       </div>
                       <div>
-                        <h3 className="text-xl font-serif text-[#1E293B] mb-2 group-hover:text-slate-900 transition-colors">Join Interview</h3>
-                        <p className="text-slate-500 text-sm leading-relaxed max-w-[280px]">
-                          Prepare for the role you&apos;ve earned. Begin your secure, AI-conducted career assessment.
-                        </p>
+                        <span className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase mb-1 block">For Candidates</span>
+                        <h3 className="text-xl lg:text-2xl font-bold text-slate-900 transition-colors">Join Interview</h3>
                       </div>
-                      <div className="mt-1 flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-indigo-900/40 tracking-[0.2em] uppercase">
-                          For Candidates
-                        </span>
-                        <span 
-                          className="inline-flex items-center gap-3 text-sm font-black text-indigo-950 tracking-widest group-hover:gap-5 transition-all uppercase"
-                        >
-                          Start Prep <ArrowRight size={18} />
-                        </span>
-                      </div>
+                    </div>
+                    
+                    <p className="text-slate-500 text-sm lg:text-base leading-relaxed mb-6 lg:mb-8 grow relative z-10">
+                       Prepare for the role you&apos;ve earned. Begin your secure, AI-conducted career assessment.
+                    </p>
+                    
+                    <div className="mt-auto relative z-10">
+                      <span className="inline-flex items-center gap-2 text-sm lg:text-[15px] font-bold text-slate-900 group-hover:gap-3 lg:group-hover:gap-4 transition-all">
+                        Start Preparation <ArrowRight size={18} />
+                      </span>
                     </div>
                   </Link>
                 </motion.div>
 
                 {/* Admin Portal Card */}
                 <motion.div 
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: typingComplete ? 0 : 50, opacity: typingComplete ? 1 : 0 }}
-                  transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
-                  className="w-full max-w-[420px] z-0"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7, duration: 0.6 }}
+                  className="w-full"
                 >
                   <Link
                     href="/admin"
-                    className="group block p-7 rounded-[1.75rem] bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 shadow-2xl hover:shadow-[0_30px_80px_rgba(15,23,42,0.4)] hover:border-slate-600 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden text-white"
+                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl hover:shadow-primary/20 hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
                   >
-                    <div className="absolute -bottom-10 -right-10 p-8 opacity-[0.05] group-hover:opacity-[0.1] group-hover:scale-110 group-hover:rotate-6 transition-all duration-700 pointer-events-none">
+                    <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] group-hover:scale-125 transition-all duration-700 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                        <Shield size={240} className="text-white" />
                     </div>
-                    <div className="flex flex-col items-start gap-5 relative z-10">
-                      <div className="w-14 h-14 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-white group-hover:text-slate-900 transition-all duration-500">
+                    
+                    <div className="flex items-center gap-4 mb-5 relative z-10">
+                      <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-white group-hover:text-slate-900 transition-all duration-300">
                         <Shield size={28} />
                       </div>
                       <div>
-                        <h3 className="text-xl font-serif text-white mb-2">Admin Portal</h3>
-                        <p className="text-indigo-100 text-sm leading-relaxed max-w-[280px]">
-                          Streamline your hiring workflow. Use our AI to evaluate candidates at scale.
-                        </p>
+                        <span className="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase mb-1 block">For HR & Recruiters</span>
+                        <h3 className="text-xl lg:text-2xl font-bold text-white mb-1">Admin Portal</h3>
                       </div>
-                      <div className="mt-1 flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-indigo-100/50 tracking-[0.2em] uppercase">
-                          For HRs
-                        </span>
-                        <span 
-                          className="inline-flex items-center gap-3 text-sm font-black text-white tracking-widest group-hover:gap-5 transition-all uppercase"
-                        >
-                          Launch Portal <ArrowRight size={18} />
-                        </span>
-                      </div>
+                    </div>
+                    
+                    <p className="text-slate-400 text-sm lg:text-base leading-relaxed mb-6 lg:mb-8 grow relative z-10">
+                      Streamline your hiring workflow. Use our advanced AI to evaluate candidates fairly, efficiently, and at scale.
+                    </p>
+                    
+                    <div className="mt-auto relative z-10">
+                      <span className="inline-flex items-center gap-2 text-sm lg:text-[15px] font-bold text-white group-hover:gap-3 lg:group-hover:gap-4 transition-all">
+                        Launch Dashboard <ArrowRight size={18} />
+                      </span>
                     </div>
                   </Link>
                 </motion.div>
@@ -211,7 +197,7 @@ export default function Hero({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="h-[300px]" 
+              className="h-[350px]" 
             />
           )}
         </AnimatePresence>

@@ -25,10 +25,10 @@ export default function AboutUs() {
           </p>
           <ul className="space-y-5">
             {[
-              "Real-time Sentiment Analysis",
-              "Body Language & Eye-Contact Tracking",
-              "Customizable Interview Dimensions",
-              "Peer-Performance Analytics"
+              "AI Voice Interviewer",
+              "Audio & Video Candidate Records",
+              "Conceptual Rubric Evaluation",
+              "HR Decision-Support Dashboard"
             ].map((item, i) => (
               <li key={i} className="flex items-center gap-4 font-bold text-[#1E293B]">
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">

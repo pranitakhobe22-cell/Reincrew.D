@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const TOTAL_SLIDES = 6;
-const SLIDE_DURATION = 1500;
 
 export default function InteractiveRobot() {
   const [currentSlide, setCurrentSlide] = useState(3);
@@ -233,7 +232,7 @@ export default function InteractiveRobot() {
               </div>
             )}
 
-            <div className="ui-header flex justify-between items-center px-4 py-2 bg-white border-b border-border">
+            <div className="ui-header flex justify-between items-center px-4 py-2 bg-background border-b border-border">
               <div className="ui-logo text-sm font-serif text-[#1E293B]">
                 Reincrew<span className="text-primary italic">.AI</span>
               </div>
@@ -244,7 +243,7 @@ export default function InteractiveRobot() {
               <div className={`slide sl-browser ${currentSlide === 0 ? 'active' : currentSlide === 5 ? 'exit' : ''}`}>
                  <div className="browser-ui mx-auto mt-12 w-[85%] flex flex-col items-center gap-4">
                   <div className="text-lg font-serif text-[#1E293B] mb-1">Search</div>
-                  <div className="search-bar w-full h-[35px] bg-white border border-slate-200 rounded-full flex items-center px-4 text-xs font-medium text-slate-400">
+                  <div className="search-bar w-full h-[35px] bg-background border border-border rounded-full flex items-center px-4 text-xs font-medium text-slate-400">
                     <span>reincrew.ai</span><span className="v-blink" style={{ display: 'block' }}>|</span>
                   </div>
                  </div>
@@ -252,7 +251,7 @@ export default function InteractiveRobot() {
 
               {/* Slide 1: Login */}
               <div className={`slide sl-login ${currentSlide === 1 ? 'active' : currentSlide === 0 ? 'exit' : ''}`}>
-                <div className="sl-card mx-auto bg-white shadow-sm border border-slate-100">
+                <div className="sl-card mx-auto bg-card-bg shadow-sm border border-border">
                   <h3 className="font-serif">Get Started</h3>
                   <div className="sl-sub">Join 10k+ candidates</div>
                   <div className="sl-inp">email@example.com</div>
@@ -297,11 +296,11 @@ export default function InteractiveRobot() {
               <div className={`slide sl-res ${currentSlide === 4 ? 'active' : currentSlide === 3 ? 'exit' : ''}`}>
                 <h4 className="text-center mt-3 font-serif text-[#1E293B]">Performance Report</h4>
                 <div className="sl-sgrid">
-                  <div className="sl-scard bg-white">
+                  <div className="sl-scard bg-card-bg border border-border">
                     <div className="sl-sv text-primary">9.2</div><div className="sl-sl">Technical</div>
                     <div className="sl-sbar bg-slate-100"><div className="sl-sfill bg-primary sf1" style={{ width: '92%' }}></div></div>
                   </div>
-                  <div className="sl-scard bg-white">
+                  <div className="sl-scard bg-card-bg border border-border">
                     <div className="sl-sv text-amber-500">8.5</div><div className="sl-sl">Soft Skills</div>
                     <div className="sl-sbar bg-slate-100"><div className="sl-sfill bg-amber-500 sf2" style={{ width: '85%' }}></div></div>
                   </div>
@@ -311,7 +310,7 @@ export default function InteractiveRobot() {
               {/* Slide 5: Feedback */}
               <div className={`slide sl-fb ${currentSlide === 5 ? 'active' : currentSlide === 4 ? 'exit' : ''}`}>
                 <h4 className="text-center mt-3 font-serif text-[#1E293B]">AI Key Insights</h4>
-                <div className="sl-fcard bg-white border border-slate-100">
+                <div className="sl-fcard bg-card-bg border border-border">
                   <div className="sl-ftitle"><i className="sl-fi green">✓</i> Good structuring of STAR answers.</div>
                 </div>
                 <div className="sl-fcard bg-white border border-slate-100">

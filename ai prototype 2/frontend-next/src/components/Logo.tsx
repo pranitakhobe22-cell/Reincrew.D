@@ -43,7 +43,7 @@ export default function Logo({
           style={{ width: size, height: size }}
         >
           <Image 
-            src="/logo.png" 
+            src="/logo-rai.jpeg" 
             alt="Reincrew Logo" 
             fill 
             className="object-contain"

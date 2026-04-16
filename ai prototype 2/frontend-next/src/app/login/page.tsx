@@ -88,7 +88,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#FAF9F7]">
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-background">
       {/* Background Decorative Elements */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#E0E7FF_0%,transparent_50%)] opacity-50" />
@@ -110,7 +110,7 @@ function LoginContent() {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="w-full max-w-[480px] z-10"
       >
-        <div className="bg-white/80 backdrop-blur-2xl border border-white/60 shadow-2xl shadow-indigo-900/5 rounded-[2.5rem] overflow-hidden p-10 md:p-12">
+        <div className="bg-card-bg border border-border shadow-2xl shadow-indigo-900/5 rounded-[2.5rem] overflow-hidden p-10 md:p-12">
           
           <div className="flex justify-center mb-10">
             <Logo size={42} />
@@ -158,7 +158,7 @@ function LoginContent() {
                           required
                           value={formData.name}
                           onChange={handleInputChange}
-                          className="w-full h-12 pl-12 pr-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all font-medium text-slate-900"
+                          className="w-full h-12 pl-12 pr-4 rounded-xl border border-border bg-background focus:bg-card-bg focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all font-medium text-slate-900"
                           placeholder="John Doe"
                         />
                       </div>
@@ -171,7 +171,7 @@ function LoginContent() {
                           name="role"
                           value={formData.role}
                           onChange={handleInputChange}
-                          className="w-full h-12 pl-12 pr-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all font-medium text-slate-900 appearance-none"
+                          className="w-full h-12 pl-12 pr-4 rounded-xl border border-border bg-background focus:bg-card-bg focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all font-medium text-slate-900 appearance-none"
                         >
                           <option value="candidate">Candidate</option>
                           <option value="admin">Admin / HR</option>
@@ -253,7 +253,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#FAF9F7]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-10 h-10 text-primary animate-spin" />
       </div>
     }>

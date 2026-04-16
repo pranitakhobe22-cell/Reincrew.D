@@ -101,7 +101,7 @@ function AccordionItem({ item }: { item: FAQItem }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-slate-100 last:border-0">
+    <div className="border-b border-border last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-5 px-1 text-left group cursor-pointer"
@@ -165,7 +165,7 @@ export default function HelpPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
-            className="bg-white/40 backdrop-blur-md border border-white/40 rounded-[32px] p-8 md:p-10 shadow-[0_15px_45px_rgba(0,0,0,0.02)]"
+            className="bg-card-bg border border-border rounded-[32px] p-8 md:p-10 shadow-[0_15px_45px_rgba(0,0,0,0.02)]"
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -189,7 +189,7 @@ export default function HelpPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-16 bg-primary/10 backdrop-blur-md rounded-[40px] p-12 text-center border border-primary/20"
+        className="mt-16 bg-background rounded-[40px] p-12 text-center border border-border shadow-sm"
       >
         <Mail className="mx-auto text-primary mb-4" size={32} />
         <h3 className="text-xl font-serif text-slate-900 mb-3 tracking-tight">

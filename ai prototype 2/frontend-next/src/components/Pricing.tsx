@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Check, Info, Users, GraduationCap, Zap, ShieldCheck, BarChart4 } from "lucide-react";
+import Link from "next/link";
 
 export default function Pricing() {
   const [activeTab, setActiveTab] = useState<"students" | "hr">("students");
@@ -13,10 +14,10 @@ export default function Pricing() {
       desc: "Perfect for occasional practice and one-off interview prep.",
       price: "Coming Soon",
       features: [
-        "Pay-per-credit access",
-        "Role-specific mock interviews",
-        "Real-time feedback quality",
-        "Standard session reports",
+        "Voice-conducted AI interviews",
+        "Full audio & video recordings",
+        "Speech-to-text transcripts",
+        "Basic performance scoring",
       ],
       icon: <Zap className="text-primary" size={24} />,
     },
@@ -26,10 +27,10 @@ export default function Pricing() {
       price: "Coming Soon",
       popular: true,
       features: [
-        "Higher monthly interview limit",
-        "Progress tracking dashboard",
-        "Full interview history",
-        "Advanced performance trends",
+        "Priority AI voice processing",
+        "Speech-to-text transcripts",
+        "Multi-dimensional scoring",
+        "Complete recording history",
       ],
       icon: <BarChart4 className="text-primary" size={24} />,
     },
@@ -38,10 +39,10 @@ export default function Pricing() {
       desc: "For those who want unlimited training and premium UI.",
       price: "Coming Soon",
       features: [
-        "Unlimited / Very high usage",
-        "Priority AI processing",
-        "Exclusive UI themes",
-        "Personalized improvement roadmap",
+        "Unlimited AI interviews",
+        "Advanced grammar & fluency scoring",
+        "Exclusive career roadmaps",
+        "Priority technical support",
       ],
       icon: <GraduationCap className="text-primary" size={24} />,
     },
@@ -53,10 +54,10 @@ export default function Pricing() {
       desc: "Ideal for small teams or intermittent hiring needs.",
       price: "Coming Soon",
       features: [
-        "Pay-per-credit assessment",
-        "Multi-candidate screening",
-        "Standard bias-free scoring",
-        "PDF assessment reports",
+        "AI voice candidate screening",
+        "Speech-to-text transcripts",
+        "Basic scoring (Communication)",
+        "Interview recording access",
       ],
       icon: <Users className="text-primary" size={24} />,
     },
@@ -66,10 +67,10 @@ export default function Pricing() {
       price: "Coming Soon",
       popular: true,
       features: [
-        "Bulk interview handling",
-        "Candidate management dashboard",
-        "Comparison analytics",
-        "Collaborative feedback",
+        "Multi-dimensional scoring",
+        "Conceptual rubric evaluation",
+        "Ranked candidate dashboard",
+        "Full performance analytics",
       ],
       icon: <ShieldCheck className="text-primary" size={24} />,
     },
@@ -78,10 +79,10 @@ export default function Pricing() {
       desc: "Full-scale solution for high-volume hiring workflows.",
       price: "Coming Soon",
       features: [
-        "Unlimited team access",
-        "Workflow automation tools",
-        "Custom ATS integrations",
-        "Dedicated account support",
+        "Custom conceptual rubrics",
+        "Full decision-making dashboard",
+        "High-volume screening tools",
+        "Dedicated implementation team",
       ],
       icon: <BarChart4 className="text-primary" size={24} />,
     },
@@ -115,7 +116,7 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex items-center justify-center gap-2 text-text-muted max-w-2xl mx-auto mb-12 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm"
+            className="flex items-center justify-center gap-2 text-text-muted max-w-2xl mx-auto mb-12 bg-card-bg p-4 rounded-2xl border border-border shadow-sm"
           >
             <Info size={18} className="text-primary shrink-0" />
             <p className="text-sm font-medium leading-relaxed italic">
@@ -124,7 +125,7 @@ export default function Pricing() {
           </motion.div>
 
           <div className="flex justify-center mb-16">
-            <div className="p-1.5 bg-indigo-50/50 backdrop-blur-xl rounded-full flex relative w-max border border-indigo-100/50 shadow-inner">
+            <div className="p-1.5 bg-indigo-50 rounded-full flex relative w-max border border-indigo-100 shadow-inner">
               {["students", "hr"].map((tab) => (
                 <button
                   key={tab}
@@ -139,7 +140,7 @@ export default function Pricing() {
                   {activeTab === tab && (
                     <motion.div
                       layoutId="pricing-active-pill"
-                      className="absolute inset-0 bg-white rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-white z-0"
+                      className="absolute inset-0 bg-card-bg rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-border z-0"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                     />
                   )}
@@ -160,8 +161,8 @@ export default function Pricing() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className={`relative p-10 rounded-[40px] border flex flex-col group transition-all duration-500 ${
                   plan.popular 
-                    ? "bg-slate-900/90 backdrop-blur-xl border-slate-700 shadow-2xl scale-105 z-20" 
-                    : "bg-white/60 backdrop-blur-xl border-white/60 shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(99,102,241,0.15)] z-10"
+                    ? "bg-slate-900 border border-slate-700 shadow-2xl scale-105 z-20" 
+                    : "bg-card-bg border border-border shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(99,102,241,0.15)] z-10"
                 }`}
               >
                 {plan.popular && (
@@ -170,9 +171,7 @@ export default function Pricing() {
                   </div>
                 )}
                 
-                <div className={`mb-8 w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500 ${
-                  plan.popular ? "bg-white/10" : "bg-primary/5"
-                }`}>
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-card-bg group-hover:text-slate-900 transition-all duration-300 mb-8">
                   {plan.icon}
                 </div>
 
@@ -204,13 +203,13 @@ export default function Pricing() {
                   ))}
                 </ul>
 
-                <button className={`w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all border ${
+                <Link href="/login" className={`w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all border text-center ${
                   plan.popular 
-                    ? "bg-primary text-white border-primary hover:bg-white hover:text-slate-900" 
-                    : "bg-white text-slate-900 border-slate-200 hover:border-primary hover:text-primary"
+                    ? "bg-primary text-white border-primary hover:bg-card-bg hover:text-slate-900" 
+                    : "bg-card-bg text-slate-900 border-border hover:border-primary hover:text-primary"
                 }`}>
                   Get Started
-                </button>
+                </Link>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -221,21 +220,21 @@ export default function Pricing() {
            initial={{ opacity: 0, y: 30 }}
            whileInView={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.8 }}
-           className="bg-primary/10 backdrop-blur-md rounded-[40px] p-12 text-center border border-primary/20"
+           className="bg-indigo-50 rounded-[40px] p-12 text-center border border-indigo-100"
         >
           <h3 className="text-xl font-serif text-slate-900 mb-4 tracking-tight">Need something flexible?</h3>
           <p className="text-slate-600 mb-8 max-w-xl mx-auto font-medium">
             Purchase interview credits that never expire. Perfect for quick mock sessions or one-off assessments.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
-            <div className="bg-white/80 backdrop-blur-sm px-8 py-4 rounded-2xl border border-white flex items-center gap-4">
+            <div className="bg-card-bg px-8 py-4 rounded-2xl border border-border flex items-center gap-4">
               <Zap className="text-primary" size={20} />
               <div className="text-left">
                 <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Single Pack</div>
                 <div className="text-sm font-bold text-slate-900">Coming Soon</div>
               </div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm px-8 py-4 rounded-2xl border border-white flex items-center gap-4">
+            <div className="bg-card-bg px-8 py-4 rounded-2xl border border-border flex items-center gap-4">
               <Zap className="text-primary" size={20} />
               <div className="text-left">
                 <div className="text-xs font-black text-slate-400 uppercase tracking-widest">Bundle Pack</div>

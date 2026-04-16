@@ -86,7 +86,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
           <p className="font-bold text-slate-400">Loading Intelligence...</p>
@@ -96,9 +96,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-bottom border-slate-200 px-8 py-4 flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-card-bg border-bottom border-border px-8 py-4 flex items-center justify-between">
         <Logo size={28} />
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">
@@ -145,7 +145,7 @@ export default function AdminPage() {
             </div>
           </div>
           
-          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+          <div className="bg-card-bg border border-border rounded-3xl overflow-hidden shadow-sm">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50 border-bottom border-slate-200 uppercase text-[10px] font-black text-slate-400 tracking-widest">
@@ -202,14 +202,14 @@ export default function AdminPage() {
                   placeholder="Search candidates..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium w-[240px]"
+                  className="pl-10 pr-4 h-10 rounded-xl border border-border bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium w-[240px]"
                 />
               </div>
               <div className="relative">
                 <select 
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-4 pr-10 h-10 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-bold appearance-none cursor-pointer min-w-[140px]"
+                  className="pl-4 pr-10 h-10 rounded-xl border border-border bg-background focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-bold appearance-none cursor-pointer min-w-[140px]"
                 >
                   <option value="all">All Status</option>
                   <option value="completed">Completed</option>
@@ -220,7 +220,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-4xl overflow-hidden shadow-sm">
+          <div className="bg-card-bg border border-border rounded-4xl overflow-hidden shadow-sm">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50 border-bottom border-slate-200 uppercase text-[10px] font-black text-slate-400 tracking-widest">
@@ -273,7 +273,7 @@ export default function AdminPage() {
 
 function StatCard({ label, value, icon }: { label: string, value: any, icon: React.ReactNode }) {
   return (
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+    <div className="bg-card-bg p-6 rounded-3xl border border-border shadow-sm flex items-center justify-between">
       <div>
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{label}</p>
         <p className="text-2xl font-serif font-black text-slate-900">{value ?? '-'}</p>

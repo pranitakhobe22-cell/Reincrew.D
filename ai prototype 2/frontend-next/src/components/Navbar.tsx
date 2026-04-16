@@ -6,9 +6,9 @@ import Logo from "./Logo";
 import { useState } from "react";
 
 const NAV_LINKS = [
-  { href: "#features", label: "Features" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#about", label: "Our AI" }
+  { href: "/#features", label: "Features" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/#about", label: "Our AI" }
 ];
 
 export default function Navbar({ 
@@ -52,7 +52,7 @@ export default function Navbar({
           className="hidden md:flex flex-1 justify-center pointer-events-auto transition-all duration-300"
         >
           <div 
-            className="flex items-center gap-1 p-1.5 backdrop-blur-2xl bg-white/40 border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-full relative"
+            className="flex items-center gap-1 p-1.5 bg-card-bg border border-border/80 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-full relative"
             onMouseLeave={() => setHoveredIndex(null)}
           >
             {NAV_LINKS.map((link, idx) => (
@@ -64,9 +64,9 @@ export default function Navbar({
               >
                 {link.label}
                 {hoveredIndex === idx && (
-                  <motion.div
+                    <motion.div
                     layoutId="navbar-active-pill"
-                    className="absolute inset-0 bg-white/70 rounded-full -z-10 shadow-sm border border-white/80"
+                    className="absolute inset-0 bg-card-bg/95 rounded-full -z-10 shadow-sm border border-border"
                     transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
                   />
                 )}
@@ -92,7 +92,7 @@ export default function Navbar({
             Sign In
           </Link>
           <Link 
-            href="#waitlist" 
+            href="/#waitlist" 
             className="px-6 py-2.5 rounded-full bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50"
           >
             Get Early Access

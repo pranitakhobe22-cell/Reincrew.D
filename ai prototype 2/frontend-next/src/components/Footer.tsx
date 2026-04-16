@@ -49,19 +49,19 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative pt-24 pb-12 px-[8%] border-t border-slate-100 bg-white/30 backdrop-blur-md overflow-hidden">
+    <footer className="relative pt-16 pb-8 px-[8%] border-t border-border bg-[#FAFAF9] overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-16 mb-12">
           
           {/* Brand Section */}
           <div className="lg:col-span-4 flex flex-col items-center md:items-start text-center md:text-left">
-            <Link href="/" className="font-serif text-4xl text-[#1E293B] font-bold tracking-tight mb-8 block">
+            <Link href="/" className="font-serif text-4xl text-[#1E293B] font-bold tracking-tight mb-5 block">
               Reincrew<span className="text-primary italic">.AI</span>
             </Link>
-            <p className="text-slate-500 font-medium leading-[1.8] max-w-sm mb-10 text-[15px]">
+            <p className="text-slate-500 font-medium leading-[1.8] max-w-sm mb-6 text-[15px]">
               The powerful intersection of talent and opportunity. Empowering candidates to master their interviews while helping HR teams identify top talent.
             </p>
             <div className="flex items-center gap-5">
@@ -80,9 +80,9 @@ export default function Footer() {
           {/* Links Sections */}
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-12">
             {footerLinks.map((column) => (
-              <div key={column.title} className="flex flex-col gap-8">
+              <div key={column.title} className="flex flex-col gap-5">
                 <h4 className="text-[#1E293B] font-black text-[11px] uppercase tracking-[0.2em]">{column.title}</h4>
-                <ul className="flex flex-col gap-5">
+                <ul className="flex flex-col gap-3">
                   {column.links.map((link) => (
                     <li key={link.label}>
                       {link.internal ? (
@@ -114,7 +114,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[13px] text-slate-400 font-bold">
             &copy; {currentYear} Reincrew.AI. All rights reserved.
           </p>

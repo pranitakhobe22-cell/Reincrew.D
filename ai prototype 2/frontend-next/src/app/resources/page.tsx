@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { BookOpen, Video, FileText, Lightbulb, TrendingUp, Users, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import SecondaryPageLayout from "@/components/SecondaryPageLayout";
 
 const RESOURCES = [
@@ -71,13 +72,13 @@ export default function ResourcesPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: idx * 0.1 }}
-            className="group bg-white/40 backdrop-blur-md border border-white/40 p-8 rounded-[40px] shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.05)] transition-all flex flex-col items-start"
+            className="group bg-card-bg border border-border p-8 rounded-[40px] shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.05)] transition-all flex flex-col items-start"
           >
             <div className="flex w-full items-center justify-between mb-8">
               <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                 {resource.icon}
               </div>
-              <span className="px-3 py-1 bg-white/50 border border-white/60 rounded-full text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
+              <span className="px-3 py-1 bg-card-bg/50 border border-border/60 rounded-full text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">
                 {resource.tag}
               </span>
             </div>
@@ -111,11 +112,11 @@ export default function ResourcesPage() {
             <input 
               type="email" 
               placeholder="Your email address" 
-              className="flex-1 bg-white/10 border border-white/20 rounded-full px-6 py-4 text-white placeholder:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-white/30 backdrop-blur-md"
+              className="flex-1 bg-background border border-border rounded-full px-6 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50"
             />
-            <button className="bg-white text-primary px-8 py-4 rounded-full font-bold hover:shadow-xl transition-all hover:-translate-y-1">
+            <Link href="/#waitlist" className="bg-white text-primary px-8 py-4 rounded-full font-bold hover:shadow-xl transition-all hover:-translate-y-1 inline-flex justify-center items-center">
               Join Waitlist
-            </button>
+            </Link>
           </div>
         </div>
         {/* Background elements */}

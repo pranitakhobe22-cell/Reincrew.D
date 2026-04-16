@@ -14,7 +14,7 @@ export default function SecondaryPageLayout({
       <div className="flex flex-col relative z-10 min-h-screen">
         <Navbar showLinks={true} isStatic={true} />
         <main className="flex-1 pt-32 pb-20 px-[8%]">
-          <div className="max-w-5xl mx-auto">{children}</div>
+          <div className="max-w-6xl mx-auto">{children}</div>
         </main>
         <Footer />
       </div>

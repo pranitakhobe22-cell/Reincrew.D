@@ -47,9 +47,8 @@ export default function WaitlistSection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-5xl bg-indigo-50/40 backdrop-blur-xl border border-indigo-100/60 rounded-[3rem] p-10 md:p-16 text-center shadow-2xl shadow-indigo-900/5 relative overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-linear-to-br from-indigo-100/40 via-white/40 to-indigo-50/20" />
+        className="w-full max-w-5xl bg-card-bg border border-border rounded-[3rem] p-10 md:p-16 text-center shadow-2xl shadow-indigo-900/5 relative overflow-hidden"
+>         <div className="absolute inset-0 bg-linear-to-br from-indigo-100/40 via-card-bg/80 to-indigo-50/60" />
         
         {/* Decorative elements */}
         <div className="absolute -top-10 -left-10 text-indigo-200/40 transform -rotate-12">
@@ -78,7 +77,7 @@ export default function WaitlistSection() {
                 placeholder="Enter your work email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-14 px-6 rounded-2xl border border-slate-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 shadow-sm transition-all text-[#1E293B] text-base placeholder:text-slate-400"
+                className="w-full h-14 px-6 rounded-2xl border border-border bg-card-bg/95 focus:bg-card-bg focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 shadow-sm transition-all text-[#1E293B] text-base placeholder:text-slate-400"
                 disabled={status === "loading" || status === "success"}
               />
             </div>

@@ -69,7 +69,7 @@ export default function TermsPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: idx * 0.1 }}
-            className="bg-white/40 backdrop-blur-md border border-white/40 rounded-[32px] p-8 md:p-10 shadow-[0_15px_45px_rgba(0,0,0,0.02)]"
+            className="bg-card-bg border border-border rounded-[32px] p-8 md:p-10 shadow-[0_15px_45px_rgba(0,0,0,0.02)]"
           >
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center">
