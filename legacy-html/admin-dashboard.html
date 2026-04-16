@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Admin Dashboard</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1e293b;min-height:100vh}
+
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:#ffffff;border-bottom:1px solid #e2e8f0}
+    .navbar .logo{font-size:1.3rem;font-weight:700;color:#0f172a}
+    .navbar .logo span{color:#7a9ebf}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .admin-badge{background:#7a9ebf11;color:#7a9ebf;padding:4px 12px;border-radius:12px;font-size:.8rem;font-weight:600}
+    .logout{color:#ff6b6b;cursor:pointer;background:none;border:none;font-size:.9rem;font-family:inherit}
+    .logout:hover{color:#ff4444}
+
+    .main{max-width:1200px;margin:0 auto;padding:32px 24px}
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px}
+    .page-header h1{font-size:1.5rem;color:#0f172a}
+    .page-header p{color:#64748b;font-size:.9rem;width:100%}
+
+    /* Analytics Cards */
+    .analytics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+    .a-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:20px}
+    .a-card .label{font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+    .a-card .value{font-size:1.8rem;font-weight:700;color:#7a9ebf}
+    .a-card .sub{font-size:.8rem;color:#94a3b8;margin-top:4px}
+
+    /* Top Candidates */
+    .top-section{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:32px}
+    .top-section h3{color:#0f172a;margin-bottom:16px;font-size:1.05rem}
+    .top-list{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+    .top-card{background:transparent;border:1px solid #e2e8f0;border-radius:10px;padding:16px;min-width:180px;text-align:center;flex-shrink:0}
+    .top-rank{font-size:1.2rem;font-weight:700;color:#7a9ebf;margin-bottom:6px}
+    .top-name{font-size:.9rem;color:#0f172a;font-weight:600;margin-bottom:2px}
+    .top-email{font-size:.8rem;color:#888;margin-bottom:6px;word-break:break-all}
+    .top-score{font-size:1.1rem;font-weight:700;padding:2px 10px;border-radius:6px;display:inline-block}
+
+    /* Table Controls */
+    .table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+    .table-header h3{color:#0f172a;font-size:1.05rem}
+    .table-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .search-input{padding:8px 14px;background:#ffffff;border:1px solid #cbd5e1;border-radius:6px;color:#1e293b;font-size:.85rem;width:200px}
+    .search-input:focus{outline:none;border-color:#7a9ebf}
+    .sort-btn{padding:8px 14px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;color:#64748b;font-size:.85rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+    .sort-btn:hover{border-color:#7a9ebf;color:#7a9ebf}
+    .sort-btn.active{background:#7a9ebf22;color:#7a9ebf;border-color:#7a9ebf}
+    .filter-select{padding:8px 12px;background:#ffffff;border:1px solid #cbd5e1;border-radius:6px;color:#1e293b;font-size:.85rem}
+    .filter-select:focus{outline:none;border-color:#7a9ebf}
+    .filter-select option{background:#ffffff}
+
+    /* Intelligence Table */
+    .table-wrap{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead{background:#f8fafc}
+    th{padding:14px 16px;text-align:left;font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;font-weight:600;cursor:pointer;user-select:none;white-space:nowrap;transition:color .2s}
+    th:hover{color:#7a9ebf}
+    th .arrow{font-size:.7rem;margin-left:4px;opacity:.5}
+    th.sorted .arrow{opacity:1;color:#7a9ebf}
+    td{padding:14px 16px;border-top:1px solid #f1f5f9;font-size:.9rem}
+    tr:hover{background:#f1f5f9}
+
+    .td-name{font-weight:600;color:#0f172a}
+    .td-email{font-size:.8rem;color:#64748b}
+    .score-badge{font-weight:700;padding:3px 10px;border-radius:6px;font-size:.85rem;display:inline-block}
+    .score-high{background:#dcfce7;color:#166534}
+    .score-mid{background:#fef9c3;color:#854d0e}
+    .score-low{background:#fee2e2;color:#991b1b}
+    .status-badge{font-size:.75rem;padding:3px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;display:inline-block}
+    .status-completed{background:#dcfce7;color:#166534}
+    .status-in_progress{background:#fef9c3;color:#854d0e}
+
+    .summary-cell{max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#bbb;font-size:.85rem}
+
+    .empty-state{text-align:center;padding:40px;color:#888}
+    .table-footer{padding:12px 16px;font-size:.8rem;color:#888;text-align:right;border-top:1px solid #1a1a2a}
+
+    .loading{text-align:center;padding:40px;color:#888}
+    .spinner{display:inline-block;width:24px;height:24px;border:3px solid #2a2a3a;border-radius:50%;border-top-color:#7a9ebf;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .msg{padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:16px;display:none}
+    .msg.error{background:#2d1520;border:1px solid #5c2030;color:#ff6b6b;display:block}
+
+    /* Monitoring Section */
+    .monitor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+    .monitor-header h3{color:#0f172a;font-size:1.05rem;display:flex;align-items:center;gap:10px}
+    .violation-badge{background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;display:none}
+    .violation-badge.active{display:inline-block;animation:badgePulse 2s infinite}
+    @keyframes badgePulse{0%,100%{opacity:1}50%{opacity:.6}}
+    .auto-refresh-label{font-size:.75rem;color:#94a3b8;display:flex;align-items:center;gap:6px}
+    .auto-refresh-dot{width:6px;height:6px;border-radius:50%;background:#6bff8b;animation:camBlink 1.5s infinite}
+    .monitor-table-wrap{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:32px}
+    .monitor-table-wrap table{width:100%;border-collapse:collapse}
+    .monitor-table-wrap thead{background:#f8fafc}
+    .monitor-table-wrap th{padding:12px 16px;text-align:left;font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;font-weight:600;white-space:nowrap}
+    .monitor-table-wrap td{padding:12px 16px;border-top:1px solid #f1f5f9;font-size:.85rem}
+    .monitor-table-wrap tr:hover{background:#f1f5f9}
+    .vtype-badge{font-size:.75rem;padding:3px 10px;border-radius:12px;font-weight:600;display:inline-block}
+    .vtype-faceMissing{background:#2d1520;color:#ff6b6b}
+    .vtype-suspiciousLookAway{background:#2d2a15;color:#ffd56b}
+    .vtype-possibleReadingAssist{background:#1a1a3d;color:#8b8bff}
+    .vtype-multiplePersonsDetected{background:#2d1520;color:#ff6b6b}
+    .preview-btn{padding:5px 12px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;color:#7a9ebf;font-size:.8rem;cursor:pointer;transition:all .2s}
+    .preview-btn:hover{background:#7a9ebf;color:#fff;border-color:#7a9ebf}
+    .preview-btn:disabled{opacity:.4;cursor:not-allowed}
+    .monitor-footer{padding:10px 16px;font-size:.8rem;color:#555;text-align:right;border-top:1px solid #1a1a2a}
+
+    /* Evidence Modal */
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:1000}
+    .modal-overlay.open{display:flex}
+    .modal{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;max-width:640px;width:90%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f1f5f9}
+    .modal-head h4{color:#0f172a;font-size:1rem}
+    .modal-close{background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer;padding:0 4px;line-height:1}
+    .modal-close:hover{color:#ff6b6b}
+    .modal-body{padding:20px;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:12px}
+    .modal-body img,.modal-body video{max-width:100%;border-radius:8px;border:1px solid #2a2a3a}
+    .modal-meta{font-size:.8rem;color:#888;text-align:center}
+    .modal-meta span{color:#7a9ebf;font-weight:600}
+
+    @media(max-width:900px){
+      .analytics{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:640px){
+      .navbar{padding:12px 16px;flex-direction:column;gap:10px}
+      .analytics{grid-template-columns:1fr}
+      .table-wrap{overflow-x:auto}
+      table{min-width:700px}
+      .search-input{width:140px}
+    }
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <nav class="navbar">
+    <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="Logo">
+        Reincrew<span>.AI</span></div>
+    <div class="nav-right">
+      <span class="admin-badge">ADMIN</span>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p>Monitor interviews, analytics, and candidate performance</p>
+    </div>
+
+    <div id="error-msg" class="msg"></div>
+
+    <!-- Analytics -->
+    <div class="analytics" id="analytics">
+      <div class="a-card"><div class="label">Total Interviews</div><div class="value" id="a-total">-</div></div>
+      <div class="a-card"><div class="label">Completed</div><div class="value" id="a-completed">-</div></div>
+      <div class="a-card"><div class="label">In Progress</div><div class="value" id="a-progress">-</div></div>
+      <div class="a-card"><div class="label">Average Score</div><div class="value" id="a-avg">-</div><div class="sub">out of 10</div></div>
+    </div>
+
+    <!-- Top Candidates -->
+    <div class="top-section" id="top-section" style="display:none">
+      <h3>Top Candidates</h3>
+      <div class="top-list" id="top-list"></div>
+    </div>
+
+    <!-- Monitoring Intelligence -->
+    <div class="monitor-header">
+      <h3>Monitoring Intelligence <span class="violation-badge" id="violation-badge">Violations Detected</span></h3>
+      <span class="auto-refresh-label"><span class="auto-refresh-dot"></span> Auto-refresh 30s</span>
+    </div>
+    <div class="monitor-table-wrap" id="monitor-wrap" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Interview ID</th>
+            <th>Violation Type</th>
+            <th>Timestamp</th>
+            <th>Evidence</th>
+          </tr>
+        </thead>
+        <tbody id="monitor-body"></tbody>
+      </table>
+      <div class="monitor-footer" id="monitor-footer"></div>
+    </div>
+    <div class="loading" id="monitor-loading"><div class="spinner"></div></div>
+    <div id="monitor-empty" style="display:none;text-align:center;padding:24px;color:#555;margin-bottom:32px;background:#14141c;border:1px solid #1e1e2e;border-radius:12px;font-size:.9rem">No violations recorded.</div>
+
+    <!-- Evidence Preview Modal -->
+    <div class="modal-overlay" id="evidence-modal">
+      <div class="modal">
+        <div class="modal-head">
+          <h4 id="modal-title">Evidence Preview</h4>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Intelligence Table -->
+    <div class="table-header">
+      <h3>Intelligence Table</h3>
+      <div class="table-controls">
+        <input type="text" class="search-input" id="search-input" placeholder="Search by name..." oninput="filterTable()">
+        <select class="filter-select" id="status-filter" onchange="filterTable()">
+          <option value="all">All Status</option>
+          <option value="completed">Completed</option>
+          <option value="in_progress">In Progress</option>
+        </select>
+        <button class="sort-btn" onclick="toggleSort('score')">Score <span id="sort-score-arrow">&#8597;</span></button>
+        <button class="sort-btn" onclick="toggleSort('date')">Date <span id="sort-date-arrow">&#8597;</span></button>
+        <button class="sort-btn" onclick="toggleSort('name')">Name <span id="sort-name-arrow">&#8597;</span></button>
+      </div>
+    </div>
+
+    <div class="loading" id="table-loading"><div class="spinner"></div></div>
+
+    <div class="table-wrap" id="table-wrap" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="toggleSort('name')">Candidate <span class="arrow">&#8597;</span></th>
+            <th onclick="toggleSort('score')">Score <span class="arrow">&#8597;</span></th>
+            <th>Summary</th>
+            <th onclick="toggleSort('status')">Status <span class="arrow">&#8597;</span></th>
+            <th onclick="toggleSort('date')">Date <span class="arrow">&#8597;</span></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="table-footer" id="table-footer"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const onboarded = localStorage.getItem('onboarded');
+    
+    if (!token) { window.location.href = 'login.html'; }
+    else if (onboarded === '0') { window.location.href = 'onboarding.html'; }
+    else if (role !== 'admin') { window.location.href = 'student-dashboard.html'; }
+
+    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    function handleUnauthorized(res) {
+      if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; return true; }
+      return false;
+    }
+    function authHeaders() { return { 'Authorization': 'Bearer ' + token }; }
+
+    let allInterviews = [];
+    let sortField = 'date';
+    let sortDir = 'desc';
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = msg; el.className = 'msg error';
+    }
+
+    function scoreClass(s) {
+      if (s === null || s === undefined) return '';
+      if (s >= 7) return 'score-high';
+      if (s >= 4) return 'score-mid';
+      return 'score-low';
+    }
+
+    function formatDate(d) {
+      if (!d) return '-';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+        + ' ' + dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    }
+
+    // Load analytics
+    async function loadAnalytics() {
+      try {
+        const res = await fetch(API + '/admin/analytics', { headers: authHeaders() });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success) return;
+        const a = data.data;
+        document.getElementById('a-total').textContent = a.totalInterviews;
+        document.getElementById('a-completed').textContent = a.completedInterviews;
+        document.getElementById('a-progress').textContent = a.inProgressInterviews;
+        document.getElementById('a-avg').textContent = a.averageScore + '/10';
+
+        // Top candidates
+        if (a.topCandidates && a.topCandidates.length > 0) {
+          document.getElementById('top-section').style.display = 'block';
+          document.getElementById('top-list').innerHTML = a.topCandidates.map((c, i) => {
+            const rank = i + 1;
+            return '<div class="top-card">'
+              + '<div class="top-rank">#' + rank + '</div>'
+              + '<div class="top-name">' + c.name + '</div>'
+              + '<div class="top-email">' + c.email + '</div>'
+              + '<span class="top-score score-badge ' + scoreClass(c.bestScore) + '">' + c.bestScore + '/10</span>'
+              + '<div style="font-size:.75rem;color:#888;margin-top:6px">' + c.totalInterviews + ' interview' + (c.totalInterviews > 1 ? 's' : '') + '</div>'
+              + '</div>';
+          }).join('');
+        }
+      } catch {}
+    }
+
+    // Load interviews
+    async function loadInterviews() {
+      try {
+        const res = await fetch(API + '/admin/interviews', { headers: authHeaders() });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        document.getElementById('table-loading').style.display = 'none';
+
+        if (!data.success) { showError(data.error); return; }
+
+        allInterviews = data.data.interviews;
+        document.getElementById('table-wrap').style.display = 'block';
+        renderTable();
+      } catch {
+        document.getElementById('table-loading').style.display = 'none';
+        showError('Cannot connect to server.');
+      }
+    }
+
+    function getFiltered() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const status = document.getElementById('status-filter').value;
+
+      let filtered = allInterviews.filter(iv => {
+        if (search && !iv.candidateName.toLowerCase().includes(search)) return false;
+        if (status !== 'all' && iv.status !== status) return false;
+        return true;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        let va, vb;
+        if (sortField === 'score') { va = a.score ?? -1; vb = b.score ?? -1; }
+        else if (sortField === 'date') { va = a.date || ''; vb = b.date || ''; }
+        else if (sortField === 'name') { va = a.candidateName.toLowerCase(); vb = b.candidateName.toLowerCase(); }
+        else if (sortField === 'status') { va = a.status; vb = b.status; }
+        else { va = a[sortField]; vb = b[sortField]; }
+
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      return filtered;
+    }
+
+    function renderTable() {
+      const filtered = getFiltered();
+      const tbody = document.getElementById('table-body');
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No interviews found.</td></tr>';
+        document.getElementById('table-footer').textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(iv => {
+        const scoreHtml = iv.score !== null
+          ? '<span class="score-badge ' + scoreClass(iv.score) + '">' + iv.score + '/10</span>'
+          : '<span style="color:#888">-</span>';
+        const statusCls = 'status-' + iv.status;
+        return '<tr>'
+          + '<td><div class="td-name">' + iv.candidateName + '</div><div class="td-email">' + iv.candidateEmail + '</div></td>'
+          + '<td>' + scoreHtml + '</td>'
+          + '<td><div class="summary-cell">' + (iv.summary || '-') + '</div></td>'
+          + '<td><span class="status-badge ' + statusCls + '">' + iv.status.replace('_', ' ') + '</span></td>'
+          + '<td>' + formatDate(iv.date) + '</td>'
+          + '</tr>';
+      }).join('');
+
+      document.getElementById('table-footer').textContent = 'Showing ' + filtered.length + ' of ' + allInterviews.length + ' interviews';
+    }
+
+    function filterTable() {
+      renderTable();
+    }
+
+    function toggleSort(field) {
+      if (sortField === field) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortField = field;
+        sortDir = field === 'score' ? 'desc' : (field === 'date' ? 'desc' : 'asc');
+      }
+
+      // Update sort button states
+      document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+      const arrows = { score: 'sort-score-arrow', date: 'sort-date-arrow', name: 'sort-name-arrow' };
+      if (arrows[field]) {
+        const arrowEl = document.getElementById(arrows[field]);
+        arrowEl.parentElement.classList.add('active');
+        arrowEl.innerHTML = sortDir === 'asc' ? '&#8593;' : '&#8595;';
+      }
+
+      renderTable();
+    }
+
+    // ==================== MONITORING ====================
+    let monitoringData = [];
+    let monitorRefreshTimer = null;
+
+    async function loadMonitoring() {
+      try {
+        const res = await fetch(API + '/admin/monitoring', { headers: authHeaders() });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success) return;
+
+        monitoringData = data.data.violations || [];
+        renderMonitoring();
+      } catch {
+        // Silently fail — auto-refresh will retry
+      }
+    }
+
+    function renderMonitoring() {
+      const badge = document.getElementById('violation-badge');
+      const wrap = document.getElementById('monitor-wrap');
+      const empty = document.getElementById('monitor-empty');
+      const loading = document.getElementById('monitor-loading');
+      loading.style.display = 'none';
+
+      if (monitoringData.length === 0) {
+        wrap.style.display = 'none';
+        empty.style.display = 'block';
+        badge.classList.remove('active');
+        return;
+      }
+
+      empty.style.display = 'none';
+      wrap.style.display = 'block';
+      badge.classList.add('active');
+      badge.textContent = monitoringData.length + ' Violation' + (monitoringData.length > 1 ? 's' : '') + ' Detected';
+
+      const tbody = document.getElementById('monitor-body');
+      tbody.innerHTML = monitoringData.map(v => {
+        const vtypeClass = 'vtype-' + (v.violationType || '').replace(/\s/g, '');
+        const vtypeLabel = formatViolationType(v.violationType);
+        const ts = formatDate(v.timestamp || v.createdAt);
+        const hasMedia = !!v.mediaPath;
+        const previewBtn = hasMedia
+          ? '<button class="preview-btn" onclick="openEvidence(\'' + escapeAttr(v.mediaPath) + '\',\'' + escapeAttr(v.violationType) + '\',\'' + escapeAttr(v.candidateName || '') + '\')">Preview</button>'
+          : '<button class="preview-btn" disabled>No media</button>';
+
+        return '<tr>'
+          + '<td><div class="td-name">' + escapeHtml(v.candidateName || '-') + '</div><div class="td-email">' + escapeHtml(v.candidateEmail || '') + '</div></td>'
+          + '<td style="color:#7a9ebf;font-weight:600">#' + v.interviewId + '</td>'
+          + '<td><span class="vtype-badge ' + vtypeClass + '">' + vtypeLabel + '</span></td>'
+          + '<td>' + ts + '</td>'
+          + '<td>' + previewBtn + '</td>'
+          + '</tr>';
+      }).join('');
+
+      document.getElementById('monitor-footer').textContent = monitoringData.length + ' violation' + (monitoringData.length > 1 ? 's' : '') + ' recorded';
+    }
+
+    function formatViolationType(type) {
+      const labels = {
+        faceMissing: 'Face Missing',
+        suspiciousLookAway: 'Suspicious Look Away',
+        possibleReadingAssist: 'Possible Reading Assist',
+        multiplePersonsDetected: 'Multiple Persons',
+      };
+      return labels[type] || type || '-';
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // Evidence modal
+    function openEvidence(mediaPath, violationType, candidateName) {
+      const modal = document.getElementById('evidence-modal');
+      const body = document.getElementById('modal-body');
+      const title = document.getElementById('modal-title');
+
+      title.textContent = formatViolationType(violationType) + ' — Evidence';
+
+      const fullUrl = API + '/' + mediaPath;
+      const ext = mediaPath.split('.').pop().toLowerCase();
+      const isVideo = ['mp4', 'webm'].includes(ext);
+
+      let mediaHtml;
+      if (isVideo) {
+        mediaHtml = '<video controls autoplay muted src="' + fullUrl + '" style="max-height:60vh"></video>';
+      } else {
+        mediaHtml = '<img src="' + fullUrl + '" alt="Evidence" style="max-height:60vh">';
+      }
+
+      body.innerHTML = mediaHtml
+        + '<div class="modal-meta">'
+        + '<span>' + formatViolationType(violationType) + '</span>'
+        + (candidateName ? ' &mdash; ' + escapeHtml(candidateName) : '')
+        + '</div>';
+
+      modal.classList.add('open');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('evidence-modal');
+      modal.classList.remove('open');
+      document.getElementById('modal-body').innerHTML = '';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('evidence-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Auto-refresh all data every 30 seconds (analytics + interviews + monitoring sync with DB)
+    let dashboardRefreshTimer = null;
+
+    function startDashboardRefresh() {
+      loadMonitoring();
+      dashboardRefreshTimer = setInterval(() => {
+        loadMonitoring();
+        loadAnalytics();
+        loadInterviews();
+      }, 30000);
+    }
+
+    loadAnalytics();
+    loadInterviews();
+    startDashboardRefresh();
+  </script>
+</body>
+</html>

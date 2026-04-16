@@ -38,3 +38,9 @@ Thumbs.db
 
 # Misc
 .cache/
+
+# Custom Uploads & Internal Tooling
+**/uploads/
+.claude/
+lint_output.txt
+lint_report.json

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reincrew.AI - Resume Upload</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:transparent;color:#1e293b;min-height:100vh}
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:#ffffff;border-bottom:1px solid #e2e8f0}
+    .navbar .logo{font-size:1.3rem;font-weight:700;color:#0f172a}
+    .navbar .logo span{color:#7a9ebf}
+    .nav-links{display:flex;gap:20px;align-items:center}
+    .nav-links a{color:#64748b;text-decoration:none;font-size:.9rem;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:#7a9ebf}
+    .nav-links .logout{color:#ff6b6b;cursor:pointer;background:none;border:none;font-size:.9rem;font-family:inherit}
+
+    .main{max-width:640px;margin:0 auto;padding:40px 24px}
+    .back-link{display:inline-block;color:#7a9ebf;text-decoration:none;font-size:.9rem;margin-bottom:20px}
+    .back-link:hover{text-decoration:underline}
+    .page-title{font-size:1.5rem;color:#0f172a;margin-bottom:8px}
+    .page-sub{color:#64748b;font-size:.9rem;margin-bottom:28px}
+
+    .card{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;margin-bottom:24px}
+    .card h3{color:#0f172a;margin-bottom:16px;font-size:1.05rem}
+
+    .upload-area{border:2px dashed #cbd5e1;background:transparent;border-radius:10px;padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .2s}
+    .upload-area:hover{border-color:#7a9ebf}
+    .upload-area.dragover{border-color:#7a9ebf;background:#7a9ebf11}
+    .upload-icon{font-size:2.5rem;margin-bottom:12px;color:#7a9ebf}
+    .upload-area p{color:#64748b;font-size:.9rem}
+    .upload-area .file-name{color:#7a9ebf;font-weight:600;margin-top:8px;font-size:.95rem}
+    input[type="file"]{display:none}
+
+    .btn{width:100%;padding:12px;background:#7a9ebf;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;margin-top:16px}
+    .btn:hover{background:#5a52e0}
+    .btn:disabled{background:#3a3a4a;cursor:not-allowed}
+    .btn.skip{background:transparent;border:1px solid #cbd5e1;color:#64748b;margin-top:10px}
+    .btn.skip:hover{border-color:#7a9ebf;color:#7a9ebf}
+
+    .msg{padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:16px}
+    .msg.error{background:#fee2e2;border:1px solid #fecaca;color:#dc2626}
+    .msg.success{background:#dcfce7;border:1px solid #bbf7d0;color:#166534}
+
+    .result{margin-top:16px}
+    .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+    .info-row:last-child{border-bottom:none}
+    .info-row .label{color:#64748b;font-size:.9rem}
+    .info-row .value{color:#1e293b;font-size:.9rem;font-weight:500}
+    .skills-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .skill-tag{background:#7a9ebf11;color:#7a9ebf;padding:6px 14px;border-radius:20px;font-size:.85rem;border:1px solid #7a9ebf22}
+
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.1);border-radius:50%;border-top-color:#fff;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:640px){.navbar{padding:12px 16px;flex-direction:column;gap:10px}}
+  
+
+
+
+    /* The Darker SVG Waves */
+    .breeze-waves {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40vh;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23436d93" fill-opacity="0.3" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path><path fill="%232c4a67" fill-opacity="0.15" d="M0,96L48,117.3C96,139,192,181,288,181.3C384,181,480,139,576,128C672,117,768,139,864,149.3C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+      background-size: 1440px 100%;
+      animation: waveMotion 20s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+    @keyframes waveMotion {
+      0% { background-position: 0 0; }
+      100% { background-position: 1440px 0; }
+    }
+    .breeze-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(-45deg, #f2f5f9, #e8edf4, #dbe4ee, #f2f5f9);
+      background-size: 400% 400%;
+      animation: breezeFlow 15s ease infinite;
+      z-index: -5;
+    }
+    @keyframes breezeFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+</style>
+
+</head>
+<body>
+  
+  <div class="breeze-bg"></div>
+  <div class="breeze-waves"></div>
+
+
+  
+  
+  <nav class="navbar">
+    <div class="logo">
+        <img src="logo.png" class="logo-icon" alt="Logo">
+        Reincrew<span>.AI</span></div>
+    <div class="nav-links">
+      <a href="student-dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="resume.html" class="active">Resume</a>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <a href="student-dashboard.html" class="back-link">&#8592; Back to Dashboard</a>
+    <h1 class="page-title">Resume Upload</h1>
+    <p class="page-sub">Upload your resume for AI-powered skill extraction. This step is optional &mdash; you can skip it and proceed directly to the interview.</p>
+
+    <div id="msg" style="display:none" class="msg"></div>
+
+    <!-- Current Resume -->
+    <div class="card" id="current-resume" style="display:none">
+      <h3>Current Resume Analysis</h3>
+      <div class="result" id="current-result"></div>
+    </div>
+
+    <!-- Upload -->
+    <div class="card">
+      <h3>Upload New Resume</h3>
+      <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div class="upload-icon">&#128196;</div>
+        <p>Click or drag & drop your PDF resume here</p>
+        <p style="font-size:.8rem;color:#666;margin-top:6px">PDF only, max 5MB</p>
+        <div class="file-name" id="file-name"></div>
+      </div>
+      <input type="file" id="file-input" accept=".pdf" onchange="onFileSelect(event)">
+      <button class="btn" id="upload-btn" onclick="uploadResume()" disabled>Upload & Analyse</button>
+      <button class="btn skip" onclick="window.location.href='student-dashboard.html'">Skip for now</button>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5555';
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    function handleUnauthorized(res) {
+      if (res.status === 401) { localStorage.clear(); window.location.href = 'login.html'; return true; }
+      return false;
+    }
+
+    let selectedFile = null;
+
+    function showMsg(text, type) {
+      const el = document.getElementById('msg');
+      el.textContent = text; el.className = 'msg ' + type; el.style.display = 'block';
+    }
+
+    function onFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.type !== 'application/pdf') { showMsg('Only PDF files are allowed.', 'error'); return; }
+      if (file.size > 5 * 1024 * 1024) { showMsg('File too large. Max 5MB.', 'error'); return; }
+      selectedFile = file;
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('upload-btn').disabled = false;
+      document.getElementById('msg').style.display = 'none';
+    }
+
+    // Drag & drop
+    const dz = document.getElementById('drop-zone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) { document.getElementById('file-input').files = e.dataTransfer.files; onFileSelect({ target: { files: [file] } }); }
+    });
+
+    async function uploadResume() {
+      if (!selectedFile) return;
+      const btn = document.getElementById('upload-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Uploading & analysing...';
+
+      try {
+        const formData = new FormData();
+        formData.append('resume', selectedFile);
+
+        const res = await fetch(API + '/resume/upload', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: formData,
+        });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (!data.success) { showMsg(data.error, 'error'); btn.textContent = 'Upload & Analyse'; btn.disabled = false; return; }
+
+        showMsg('Resume uploaded and analysed successfully!', 'success');
+        renderAnalysis(data.data.analysis);
+        btn.textContent = 'Upload & Analyse';
+        btn.disabled = true;
+        selectedFile = null;
+        document.getElementById('file-name').textContent = '';
+      } catch {
+        showMsg('Cannot connect to server.', 'error');
+        btn.textContent = 'Upload & Analyse';
+        btn.disabled = false;
+      }
+    }
+
+    function renderAnalysis(a) {
+      const container = document.getElementById('current-result');
+      let html = '<div class="info-row"><span class="label">Domain</span><span class="value">' + (a.domain || '-') + '</span></div>';
+      html += '<div class="info-row"><span class="label">Experience</span><span class="value">' + (a.experience || '-') + '</span></div>';
+      html += '<div class="info-row"><span class="label">Skills</span><div class="skills-list">';
+      if (a.skills && a.skills.length > 0) {
+        html += a.skills.map(s => '<span class="skill-tag">' + s + '</span>').join('');
+      } else {
+        html += '<span style="color:#888">None detected</span>';
+      }
+      html += '</div></div>';
+      container.innerHTML = html;
+      document.getElementById('current-resume').style.display = 'block';
+    }
+
+    // Load existing resume
+    async function loadExisting() {
+      try {
+        const res = await fetch(API + '/resume', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (handleUnauthorized(res)) return;
+        const data = await res.json();
+        if (data.success && data.data.analysis) {
+          renderAnalysis(data.data.analysis);
+        }
+      } catch {}
+    }
+
+    loadExisting();
+  </script>
+</body>
+</html>
