@@ -123,9 +123,17 @@ export default function Hero({
                   transition={{ delay: 0.6, duration: 0.6 }}
                   className="w-full"
                 >
-                  <Link
-                    href="/login"
-                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-card-bg shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-400/20 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+                  <button
+                    onClick={() => {
+                      const section = document.getElementById('early-access');
+                      if (section) {
+                        section.scrollIntoView({ behavior: 'auto' }); // Instant jump
+                        const input = section.querySelector('input');
+                        if (input) input.focus();
+                        window.history.pushState(null, '', '#early-access');
+                      }
+                    }}
+                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-card-bg shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-400/20 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden w-full"
                   >
                     <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] group-hover:scale-125 transition-all duration-700 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                        <User size={240} className="text-slate-900" />
@@ -142,15 +150,15 @@ export default function Hero({
                     </div>
                     
                     <p className="text-slate-500 text-sm lg:text-base leading-relaxed mb-6 lg:mb-8 grow relative z-10">
-                       Prepare for the role you&apos;ve earned. Begin your secure, AI-conducted career assessment.
+                       Prepare for the role you&apos;ve earned. Register now for our exclusive AI assessments.
                     </p>
                     
                     <div className="mt-auto relative z-10">
                       <span className="inline-flex items-center gap-2 text-sm lg:text-[15px] font-bold text-slate-900 group-hover:gap-3 lg:group-hover:gap-4 transition-all">
-                        Start Preparation <ArrowRight size={18} />
+                        Get Early Access <ArrowRight size={18} />
                       </span>
                     </div>
-                  </Link>
+                  </button>
                 </motion.div>
 
                 {/* Admin Portal Card */}
@@ -160,9 +168,17 @@ export default function Hero({
                   transition={{ delay: 0.7, duration: 0.6 }}
                   className="w-full"
                 >
-                  <Link
-                    href="/admin"
-                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl hover:shadow-primary/20 hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+                  <button
+                    onClick={() => {
+                      const section = document.getElementById('early-access');
+                      if (section) {
+                        section.scrollIntoView({ behavior: 'auto' }); // Instant jump
+                        const input = section.querySelector('input');
+                        if (input) input.focus();
+                        window.history.pushState(null, '', '#early-access');
+                      }
+                    }}
+                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl hover:shadow-primary/20 hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden w-full"
                   >
                     <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] group-hover:scale-125 transition-all duration-700 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                        <Shield size={240} className="text-white" />
@@ -179,15 +195,15 @@ export default function Hero({
                     </div>
                     
                     <p className="text-slate-400 text-sm lg:text-base leading-relaxed mb-6 lg:mb-8 grow relative z-10">
-                      Streamline your hiring workflow. Use our advanced AI to evaluate candidates fairly, efficiently, and at scale.
+                      Streamline your hiring workflow. Register for early access to evaluate candidates fairly and efficiently.
                     </p>
                     
                     <div className="mt-auto relative z-10">
                       <span className="inline-flex items-center gap-2 text-sm lg:text-[15px] font-bold text-white group-hover:gap-3 lg:group-hover:gap-4 transition-all">
-                        Launch Dashboard <ArrowRight size={18} />
+                        Reserve Your Spot <ArrowRight size={18} />
                       </span>
                     </div>
-                  </Link>
+                  </button>
                 </motion.div>
               </div>
             </motion.div>

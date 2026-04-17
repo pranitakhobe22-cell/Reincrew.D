@@ -28,7 +28,7 @@ export default function WaitlistSection() {
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
-        setMessage("You&apos;re on the list! We&apos;ll be in touch soon.");
+        setMessage("You've been added to our waitlist! We'll be in touch soon.");
         setEmail("");
       } else {
         setStatus("error");
@@ -41,7 +41,7 @@ export default function WaitlistSection() {
   };
 
   return (
-    <section className="w-full px-[8%] py-24 flex justify-center relative z-10">
+    <section id="early-access" className="w-full px-[8%] py-24 flex justify-center relative z-10">
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
