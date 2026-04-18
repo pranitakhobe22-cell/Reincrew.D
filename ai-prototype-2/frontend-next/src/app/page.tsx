@@ -10,7 +10,9 @@ import AboutUs from "@/components/AboutUs";
 import Pricing from "@/components/Pricing";
 import Footer from "@/components/Footer";
 import SplashOverlay from "@/components/SplashOverlay";
+import TrustSection from "@/components/TrustSection";
 import WaitlistWidget from "@/components/WaitlistWidget";
+
 
 
 export type LandingPhase = 'splash' | 'settling' | 'questions' | 'content';
@@ -89,6 +91,7 @@ export default function Home() {
                   >
                     <div id="features"><Features /></div>
                     <div id="how-it-works"><HowItWorks /></div>
+                    <div id="trust"><TrustSection /></div>
                     <div id="about"><AboutUs /></div>
                     <div id="pricing"><Pricing /></div>
                     <div id="waitlist"><WaitlistWidget /></div>

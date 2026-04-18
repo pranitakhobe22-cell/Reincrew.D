@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Check, Info, Users, GraduationCap, Zap, ShieldCheck, BarChart4 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Pricing() {
   const [activeTab, setActiveTab] = useState<"students" | "hr">("students");
@@ -13,11 +14,12 @@ export default function Pricing() {
       name: "Lite",
       desc: "Perfect for occasional practice and one-off interview prep.",
       price: "Coming Soon",
+      img: "/images/img_price_1.jpg",
       features: [
-        "Voice-conducted AI interviews",
-        "Full audio & video recordings",
-        "Speech-to-text transcripts",
-        "Basic performance scoring",
+        "Full, unbiased AI feedback",
+        "Pay-per-credit access",
+        "Detailed performance report",
+        "Core interview experience",
       ],
       icon: <Zap className="text-primary" size={24} />,
     },
@@ -26,23 +28,25 @@ export default function Pricing() {
       desc: "Designed for serious job seekers aiming for consistency.",
       price: "Coming Soon",
       popular: true,
+      img: "/images/img_price_2.jpg",
       features: [
-        "Priority AI voice processing",
-        "Speech-to-text transcripts",
-        "Multi-dimensional scoring",
-        "Complete recording history",
+        "Full, unbiased AI feedback",
+        "Higher monthly interview limit",
+        "Progress tracking dashboard",
+        "Complete interview history",
       ],
       icon: <BarChart4 className="text-primary" size={24} />,
     },
     {
       name: "Plus",
-      desc: "For those who want unlimited training and premium UI.",
+      desc: "For those who want unlimited training and advanced UI.",
       price: "Coming Soon",
+      img: "/images/img_price_3.jpg",
       features: [
-        "Unlimited AI interviews",
-        "Advanced grammar & fluency scoring",
+        "Full, unbiased AI feedback",
+        "Unlimited mock interviews",
+        "Advanced analytics UI",
         "Exclusive career roadmaps",
-        "Priority technical support",
       ],
       icon: <GraduationCap className="text-primary" size={24} />,
     },
@@ -53,11 +57,12 @@ export default function Pricing() {
       name: "Recruit Lite",
       desc: "Ideal for small teams or intermittent hiring needs.",
       price: "Coming Soon",
+      img: "/images/img_price_4.jpg",
       features: [
-        "AI voice candidate screening",
-        "Speech-to-text transcripts",
-        "Basic scoring (Communication)",
-        "Interview recording access",
+        "Uniform, unbiased AI screening",
+        "Pay-per-credit access",
+        "Small-scale hiring volume",
+        "Candidate performance reports",
       ],
       icon: <Users className="text-primary" size={24} />,
     },
@@ -66,10 +71,11 @@ export default function Pricing() {
       desc: "Our most popular choice for growing organizations.",
       price: "Coming Soon",
       popular: true,
+      img: "/images/feature_hr_dashboard.png",
       features: [
-        "Multi-dimensional scoring",
-        "Conceptual rubric evaluation",
-        "Ranked candidate dashboard",
+        "Uniform, unbiased AI screening",
+        "Bulk interview capacity",
+        "Candidate management dashboard",
         "Full performance analytics",
       ],
       icon: <ShieldCheck className="text-primary" size={24} />,
@@ -78,11 +84,12 @@ export default function Pricing() {
       name: "Enterprise",
       desc: "Full-scale solution for high-volume hiring workflows.",
       price: "Coming Soon",
+      img: "/images/about_bg.jpg",
       features: [
-        "Custom conceptual rubrics",
-        "Full decision-making dashboard",
-        "High-volume screening tools",
-        "Dedicated implementation team",
+        "Uniform, unbiased AI screening",
+        "Multi-seat team access",
+        "Custom workflow tools",
+        "ATS / HRIS Integrations",
       ],
       icon: <BarChart4 className="text-primary" size={24} />,
     },
@@ -159,54 +166,70 @@ export default function Pricing() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -20 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className={`relative p-10 rounded-[40px] border flex flex-col group transition-all duration-500 ${
+                className={`relative p-6 lg:p-8 rounded-[40px] border flex flex-col group transition-all duration-500 ${
                   plan.popular 
-                    ? "bg-slate-900 border border-slate-700 shadow-2xl scale-105 z-20" 
-                    : "bg-card-bg border border-border shadow-[0_15px_45px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(99,102,241,0.15)] z-10"
+                    ? "bg-[#FDFDFB] border border-primary/20 shadow-[0_20px_60px_-15px_rgba(99,102,241,0.15)] scale-105 z-20" 
+                    : "bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 z-10"
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full shadow-lg">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-primary border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1 rounded-full shadow-sm z-30">
                     Most Popular
                   </div>
                 )}
-                
-                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-card-bg group-hover:text-slate-900 transition-all duration-300 mb-8">
-                  {plan.icon}
+
+                {/* Visual Image Header */}
+                <div className="relative w-full h-32 rounded-[24px] overflow-hidden mb-6 border border-slate-100 shadow-inner bg-slate-50">
+                  <Image
+                    src={plan.img}
+                    alt={plan.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                  
+                  {/* Floating Icon Badge */}
+                  <div className={`absolute bottom-3 right-3 w-10 h-10 rounded-xl flex items-center justify-center shadow-md backdrop-blur-md transition-all duration-500 ${
+                    plan.popular 
+                      ? "bg-white/90 text-primary border border-white/50 group-hover:bg-primary group-hover:text-white"
+                      : "bg-white/80 text-slate-500 border border-white/50 group-hover:bg-slate-900 group-hover:text-white"
+                  }`}>
+                    {plan.icon}
+                  </div>
                 </div>
 
-                <h3 className={`text-xl font-serif mb-2 ${plan.popular ? "text-white" : "text-slate-900"}`}>
+                <h3 className="text-xl lg:text-2xl font-serif text-slate-900 mb-2 group-hover:text-primary transition-colors duration-300">
                   {plan.name}
                 </h3>
-                <p className={`text-sm mb-8 leading-relaxed font-medium ${plan.popular ? "text-slate-400" : "text-text-muted"}`}>
+                <p className="text-[14px] text-slate-500 mb-6 leading-relaxed font-medium">
                   {plan.desc}
                 </p>
 
-                <div className="mb-10">
-                  <span className={`text-4xl font-serif font-bold ${plan.popular ? "text-white" : "text-slate-900"}`}>
+                <div className="mb-6">
+                  <span className="text-3xl lg:text-4xl font-serif font-bold text-slate-900 tracking-tight">
                     {plan.price}
                   </span>
                 </div>
 
-                <ul className="space-y-4 mb-10 flex-1">
+                <ul className="space-y-3 mb-8 flex-1">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className={`mt-1 shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${
-                        plan.popular ? "bg-primary" : "bg-primary/10"
+                        plan.popular ? "bg-primary/20" : "bg-slate-100"
                       }`}>
-                        <Check size={10} className={plan.popular ? "text-white" : "text-primary"} />
+                        <Check size={10} className={plan.popular ? "text-primary" : "text-slate-400"} />
                       </div>
-                      <span className={`text-sm font-medium ${plan.popular ? "text-slate-300" : "text-slate-600"}`}>
+                      <span className="text-sm font-medium text-slate-600">
                         {feature}
                       </span>
                     </li>
                   ))}
                 </ul>
 
-                <Link href="/login" className={`w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all border text-center ${
+                <Link href="/login" className={`w-full py-3 rounded-full font-bold text-sm tracking-wide transition-all border text-center ${
                   plan.popular 
-                    ? "bg-primary text-white border-primary hover:bg-card-bg hover:text-slate-900" 
-                    : "bg-card-bg text-slate-900 border-border hover:border-primary hover:text-primary"
+                    ? "bg-primary text-white border-primary shadow-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5" 
+                    : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900"
                 }`}>
                   Get Started
                 </Link>

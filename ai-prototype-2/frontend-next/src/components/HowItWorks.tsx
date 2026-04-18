@@ -2,197 +2,49 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-
-// ── Animated Visuals for Candidates ──────────────────────────────────────────
-
-function ProfileVisual() {
-  return (
-    <div className="relative w-14 h-12 flex items-center justify-center">
-      {/* Profile Card */}
-      <motion.div 
-        className="w-10 h-12 bg-primary/5 rounded-lg border border-primary/20 flex flex-col items-center pt-2"
-        animate={{ y: [0, -3, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="w-4 h-4 rounded-full border-2 border-primary/40 mb-1.5" />
-        <div className="w-6 h-1 rounded-full bg-primary/20 mb-1" />
-        <div className="w-4 h-1 rounded-full bg-primary/20" />
-      </motion.div>
-      {/* Sparkles */}
-      <motion.div 
-        className="absolute top-1 right-0 w-1.5 h-1.5 bg-primary/60 rounded-full"
-        animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      />
-      <motion.div 
-        className="absolute bottom-1 left-0 w-1 h-1 bg-primary/40 rounded-full"
-        animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0.8, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-      />
-    </div>
-  );
-}
-
-function MicVisual() {
-  const bars = [8, 14, 20, 12, 6];
-  return (
-    <div className="flex items-center gap-1 w-14 h-12 justify-center">
-      <div className="w-5 h-8 rounded-full border-2 border-primary/40 flex items-center justify-center shrink-0 mr-1 relative">
-         {/* Mic head */}
-         <div className="w-2 h-3 bg-primary/30 rounded-sm" />
-      </div>
-      <div className="flex items-center gap-0.5">
-        {bars.map((h, i) => (
-          <motion.div
-            key={i}
-            className="w-1 bg-primary/40 rounded-full"
-            animate={{ height: [h * 0.4, h, h * 0.4] }}
-            transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function GrowthVisual() {
-  return (
-    <div className="relative w-14 h-12 flex items-end pb-1 border-b-2 border-l-2 border-slate-200">
-      <motion.svg className="absolute w-full h-full inset-0 text-primary overflow-visible" fill="none">
-        <motion.path
-          d="M 2 35 L 15 25 L 28 28 L 45 10 L 52 12"
-          stroke="currentColor" 
-          strokeWidth="2.5" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: [0, 1, 1] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* Dot at the end */}
-        <motion.circle 
-          cx="45" cy="10" r="3" fill="currentColor"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: [0, 0, 1, 1], scale: [0, 0, 1, 1] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.svg>
-    </div>
-  );
-}
-
-// ── Animated Visuals for Recruiters ──────────────────────────────────────────
-
-function MailVisual() {
-  return (
-    <div className="relative w-14 h-12 flex items-center justify-center">
-      {/* Central envelop outline */}
-      <div className="relative w-8 h-6 border-2 border-primary/30 rounded bg-white z-10 flex items-center justify-center">
-        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="absolute top-1 text-primary/40">
-           <path d="M1 1L5 4L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-      </div>
-      {/* Sending arrows */}
-      {[0, 1, 2].map((i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 rounded-full border-t-2 border-r-2 border-primary/40"
-          style={{ transform: `rotate(45deg)` }}
-          animate={{ x: [0, 12, 18], opacity: [0, 1, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.5, ease: "easeOut" }}
-          initial={{ right: 8, top: 12 + i * 4 - 4 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function AIProcessVisual() {
-  return (
-    <div className="relative w-14 h-12 flex items-center justify-center gap-1.5">
-      {[0, 1, 2].map((i) => (
-        <motion.div
-          key={i}
-          className="w-3.5 h-3.5 rounded-full border-2 border-primary/30 flex items-center justify-center"
-          animate={{ 
-            borderColor: ["rgba(99,102,241,0.3)", "rgba(99,102,241,0.8)", "rgba(99,102,241,0.3)"],
-            y: [0, -3, 0] 
-          }}
-          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-        >
-          <div className="w-1 h-1 rounded-full bg-primary/40" />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-function DecisionVisual() {
-  return (
-    <div className="relative w-14 h-12 flex flex-col justify-center gap-1.5 pl-2">
-      {[1, 2].map((i) => (
-        <div key={i} className="flex items-center gap-2">
-          <motion.div 
-            className="w-3 h-3 rounded-sm border-2 border-primary/30 flex items-center justify-center text-primary"
-          >
-            <motion.svg width="6" height="5" viewBox="0 0 6 5" fill="none">
-              <motion.path 
-                d="M1 2.5L2.5 4L5 1" 
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: [0, 1, 1, 0] }}
-                transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.6 }}
-              />
-            </motion.svg>
-          </motion.div>
-          <div className="w-7 h-1.5 rounded-full bg-slate-200" />
-        </div>
-      ))}
-    </div>
-  );
-}
+import { UserCircle, Mic, TrendingUp, Mail, Users, CheckCircle2 } from "lucide-react";
 
 export default function HowItWorks() {
   const [activeTab, setActiveTab] = useState<"candidates" | "recruiters">("candidates");
 
   const candidateSteps = [
     {
-      title: "Join & Prepare",
-      desc: "Sign up and build your profile. Select the role you are applying for and get ready for a hyper-realistic mock interview.",
-      visual: <ProfileVisual />,
+      title: "Set Up Your Profile",
+      desc: "Create your professional profile and tell us about your target role to receive tailored, relevant interview scenarios.",
+      visual: <UserCircle className="w-8 h-8 text-primary/70" strokeWidth={1.5} />,
       number: "01",
     },
     {
-      title: "Take the AI Interview",
-      desc: "Interact with our AI interviewer via voice. Your session is recorded and your responses are converted to text in real-time.",
-      visual: <MicVisual />,
+      title: "Experience the Interview",
+      desc: "Engage in a natural, conversational voice interview. It feels just like speaking with a real hiring manager.",
+      visual: <Mic className="w-8 h-8 text-primary/70" strokeWidth={1.5} />,
       number: "02",
     },
     {
-      title: "Get Scored & Improve",
-      desc: "Receive instant, multi-dimensional feedback on your conceptual understanding, communication, grammar, and fluency.",
-      visual: <GrowthVisual />,
+      title: "Review & Grow",
+      desc: "Receive detailed, constructive feedback on your communication and conceptual skills to help you confidently land your next role.",
+      visual: <TrendingUp className="w-8 h-8 text-primary/70" strokeWidth={1.5} />,
       number: "03",
     },
   ];
 
   const recruiterSteps = [
     {
-      title: "Invite Candidates",
-      desc: "Easily send interview links to a batch of candidates or integrate directly with your existing ATS workflow.",
-      visual: <MailVisual />,
+      title: "Define Your Needs",
+      desc: "Set your specific hiring criteria and send invites seamlessly through your existing ATS or our platform.",
+      visual: <Mail className="w-8 h-8 text-primary/70" strokeWidth={1.5} />,
       number: "01",
     },
     {
-      title: "AI Conducts Screening",
-      desc: "Our platform simultaneously conducts and records hundreds of voice interviews, assessing each candidate on a uniform rubric.",
-      visual: <AIProcessVisual />,
+      title: "Consistent & Fair Screening",
+      desc: "Every candidate receives the exact same high-quality interview experience, evaluated fairly on a standardized rubric.",
+      visual: <Users className="w-8 h-8 text-primary/70" strokeWidth={1.5} />,
       number: "02",
     },
     {
-      title: "Review & Decide",
-      desc: "Access the HR dashboard to view ranked lists, watch recorded sessions, read transcripts, and make final hiring decisions.",
-      visual: <DecisionVisual />,
+      title: "Hire with Confidence",
+      desc: "Review clear performance insights, watch candidate highlights, and confidently make data-driven hiring decisions.",
+      visual: <CheckCircle2 className="w-8 h-8 text-primary/70" strokeWidth={1.5} />,
       number: "03",
     },
   ];

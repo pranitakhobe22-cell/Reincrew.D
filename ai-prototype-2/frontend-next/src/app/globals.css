@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F4F4F1; /* Rested Warm Pearl */
-  --foreground: #1E293B; /* Charcoal Slate */
-  --primary: #6366F1;   /* Soft Indigo */
-  --secondary: #8B5CF6;
+  --background: #FDFDFB; /* Warm Pearl White */
+  --foreground: #0F172A; /* Slate 900 */
+  --primary: #4338CA;   /* Professional Indigo */
+  --secondary: #6366F1;
   --accent: #F97316;    /* Warm Amber */
-  --bg: #F4F4F1;
-  --card-bg: #FCFCFA;
+  --bg: #FDFDFB;
+  --card-bg: #FFFFFF;
   --text: #1E293B;
   --text-muted: #64748B;
-  --border: #E5E5DE;
+  --border: #E2E8F0;
 }
 
 @theme {
@@ -23,8 +23,8 @@
   --color-card-bg: var(--card-bg);
   --color-text-muted: var(--text-muted);
   --color-border: var(--border);
-  --font-sans: var(--font-sans), 'Bricolage Grotesque', sans-serif;
-  --font-serif: var(--font-serif), 'Roboto Slab', serif;
+  --font-sans: 'Inter', var(--font-sans), sans-serif;
+  --font-serif: 'Instrument Serif', 'Roboto Slab', serif;
 }
 
 body {
@@ -33,13 +33,19 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-h2, h3, .font-serif {
+h1, h2, h3, .font-serif {
   font-family: var(--font-serif);
-  font-weight: 600; /* Professional Semi-Bold */
-  letter-spacing: 0.01em; /* Elegant Spacing */
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1.1;
+}
+
+.font-serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
 }
 
 /* Human Light Motion Background */
@@ -49,38 +55,13 @@ h2, h3, .font-serif {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
-    url('/assets/landing_bg.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: var(--bg);
   z-index: -10;
-  will-change: transform;
 }
 
-.ai-grid {
-  display: none; /* Hide the robotic grid */
-}
-
-.glow-particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--primary);
-  border-radius: 50%;
-  box-shadow: 0 0 10px var(--primary);
-  filter: blur(1px);
-  opacity: 0.3;
-  animation: floatParticle 10s infinite linear;
-}
-
-@keyframes floatParticle {
-  0% { transform: translateY(0) translateX(0); opacity: 0; }
-  10% { opacity: 0.3; }
-  90% { opacity: 0.3; }
-  100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+/* Hide robotic elements */
+.glow-particle, .ai-grid {
+  display: none !important;
 }
 
 /* Splash Screen */
@@ -488,16 +469,19 @@ h2, h3, .font-serif {
   .robot-presenter { display: none; }
 }
 
-/* Features */
-.features { padding: 100px 8%; background: var(--bg); position: relative; z-index: 10; border-top: 1px solid var(--border); }
-.section-header { text-align: center; margin-bottom: 64px; }
-.section-header h2 { font-size: 2.2rem; font-weight: 800; color: var(--text); margin-bottom: 20px; }
-.section-header p { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
-.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-.feature-card { padding: 48px 32px; background: var(--bg); border-radius: 24px; border: 1px solid var(--border); transition: transform 0.3s; }
-.feature-card:hover { transform: translateY(-10px); }
-.feature-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; }
-.feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+/* Premium Card Styles */
+.premium-card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+  border-radius: 24px;
+  transition: all 0.3s ease;
+}
 
-footer { padding: 60px 8%; text-align: center; border-top: 1px solid var(--border); background: #FAFAF9; }
-footer p { color: var(--text-muted); font-size: 0.9rem; }
+.premium-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+}
+
+footer { padding: 80px 8%; text-align: center; border-top: 1px solid var(--border); background: #FDFDFB; }
+footer p { color: var(--text-muted); font-size: 0.95rem; }

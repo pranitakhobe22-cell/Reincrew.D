@@ -8,11 +8,9 @@ import Link from "next/link";
 import { LandingPhase } from "@/app/page";
 
 const QUESTIONS = [
-  "Preparing for placements or job interviews?",
-  "Not sure how to answer interview questions?",
-  "Want to save time on candidate screening?",
-  "Need a smarter way to evaluate candidates?",
-  "Ready to improve interview outcomes?"
+  "Preparing for your next big career milestone?",
+  "Seeking a smarter, faster way to hire top talent?",
+  "Ready to experience the future of interviews?"
 ];
 
 export default function Hero({ 
@@ -133,7 +131,7 @@ export default function Hero({
                         window.history.pushState(null, '', '#early-access');
                       }
                     }}
-                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-card-bg shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-400/20 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden w-full"
+                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-card-bg shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-400/20 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden w-full"
                   >
                     <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] group-hover:scale-125 transition-all duration-700 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                        <User size={240} className="text-slate-900" />
@@ -178,7 +176,7 @@ export default function Hero({
                         window.history.pushState(null, '', '#early-access');
                       }
                     }}
-                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl hover:shadow-primary/20 hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden w-full"
+                    className="group flex flex-col h-full text-left p-6 md:p-8 lg:p-10 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl hover:shadow-primary/20 hover:border-slate-700 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden w-full"
                   >
                     <div className="absolute top-0 right-0 p-6 opacity-[0.02] group-hover:opacity-[0.05] group-hover:scale-125 transition-all duration-700 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                        <Shield size={240} className="text-white" />
